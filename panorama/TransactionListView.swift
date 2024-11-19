@@ -17,7 +17,7 @@ struct TransactionListView: View {
             List {
                 ForEach(transactions) { transaction in
                     NavigationLink(destination: EditTransactionView(transactionEdited: transaction)) {
-                        Text("Transaction \(transaction.amount, specifier: "%.2f")")
+                        Text("Transaction \(transaction.id.uuidString) \(transaction.amount, specifier: "%.2f")")
                     }
                 }
             }

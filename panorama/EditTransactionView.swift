@@ -48,6 +48,7 @@ struct EditTransactionView: View {
         }
         .navigationTitle(transactionEdited == nil ? "Create Transaction" : "Edit Transaction")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel") {
@@ -60,6 +61,7 @@ struct EditTransactionView: View {
                     dismiss()
                 }
                 .disabled(!amountValid)
+                .fontWeight(.semibold)
             }
         }
     }
