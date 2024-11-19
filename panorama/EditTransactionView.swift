@@ -10,12 +10,15 @@ struct EditTransactionView: View {
     @State private var amountPristine: Bool = true
     @State private var amountValid: Bool = false
     
+    @State private var transactionDate: Date
+    
     var transactionEdited: Transaction?
     
     init(transactionEdited: Transaction? = nil) {
         self.transactionEdited = transactionEdited
         _amount = State(initialValue: transactionEdited?.amount)
         _amountValid = State(initialValue: transactionEdited?.amount != nil)
+        _transactionDate = State(initialValue: transactionEdited?.date ?? Calendar.current.startOfDay(for: .now))
     }
     
     var body: some View {
@@ -43,6 +46,9 @@ struct EditTransactionView: View {
                         .foregroundColor(.red)
                         .font(.system(size: 11))
                         .frame(maxWidth: .infinity, alignment: .trailing) : nil
+                }
+                DatePicker(selection: $transactionDate, displayedComponents: .date) {
+                    Text("Date")
                 }
             }
         }
@@ -75,7 +81,7 @@ struct EditTransactionView: View {
                 print("Updating transaction with amount: \(amount)")
             } else {
                 // Insert new transaction
-                let newTransaction = Transaction(amount: amount)
+                let newTransaction = Transaction(amount: amount, date: transactionDate)
                 modelContext.insert(newTransaction)
                 print("Creating new transaction with amount: \(amount)")
             }
@@ -92,7 +98,7 @@ struct EditTransactionView: View {
 
 #Preview("Edit Transaction") {
     NavigationView {
-        EditTransactionView(transactionEdited: Transaction(amount: 24.0))
+        EditTransactionView(transactionEdited: Transaction(amount: 24.0, date: .now))
             .modelContainer(for: Transaction.self, inMemory: true)
     }
 }

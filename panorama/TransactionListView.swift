@@ -38,9 +38,21 @@ struct TransactionListView: View {
     let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: Transaction.self, configurations: configuration)
     
-    container.mainContext.insert(Transaction(amount: 17))
-    container.mainContext.insert(Transaction(amount: -20))
-    container.mainContext.insert(Transaction(amount: 17.54))
+    var comps1 = DateComponents()
+    comps1.day = 21
+    comps1.month = 10
+    comps1.year = 2020
+
+    container.mainContext.insert(Transaction(amount: 17, date: Calendar.current.date(from: comps1)!))
+    
+    var comps2 = DateComponents()
+    comps2.day = 21
+    comps2.month = 3
+    comps2.year = 2022
+
+    container.mainContext.insert(Transaction(amount: -20, date: Calendar.current.date(from: comps2)!))
+    
+    container.mainContext.insert(Transaction(amount: 17.54, date: Calendar.current.startOfDay(for: .now)))
     
     
     return NavigationStack {
