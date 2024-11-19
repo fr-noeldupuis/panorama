@@ -1,65 +1,91 @@
-//
-//  EditTransactionView.swift
-//  panorama
-//
-//  Created by Noel Dupuis on 18/11/2024.
-//
-
 import SwiftUI
 import SwiftData
 
 struct EditTransactionView: View {
+    
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
 
-    @State private var amount : Double?
+    @State private var amount: Double?
+    @State private var amountPristine: Bool = true
+    @State private var amountValid: Bool = false
     
     var transactionEdited: Transaction?
     
     init(transactionEdited: Transaction? = nil) {
         self.transactionEdited = transactionEdited
         _amount = State(initialValue: transactionEdited?.amount)
+        _amountValid = State(initialValue: transactionEdited?.amount != nil)
     }
     
     var body: some View {
         Form {
-            LabeledContent {
-                TextField("Required", text: Binding(
-                    get: {amount != nil ? String(amount!) : ""},
-                    set: {newValue in amount = Double(newValue)}
-                ))
-                .keyboardType(.decimalPad)
-            } label: {
-                Text("Amount")
+            Section {
+                VStack {
+                    HStack {
+                        Text("Amount")
+                        Spacer()
+                        TextField("Required", text: Binding(
+                            get: { amount != nil ? String(amount!) : "" },
+                            set: { newValue in
+                                amount = Double(newValue)
+                                if !newValue.isEmpty  {
+                                    amountPristine = false
+                                }
+                                amountValid = amount != nil
+
+                            }
+                        ))
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                    }
+                    !amountPristine && !amountValid ? Text("Amount is required and must be numeric.")
+                        .foregroundColor(.red)
+                        .font(.system(size: 12))
+                        .frame(maxWidth: .infinity, alignment: .trailing) : nil
+                }
             }
-            .multilineTextAlignment(.trailing)
-                
         }
-        .navigationTitle(transactionEdited == nil ? "Create transaction" : "Edit Transaction")
+        .navigationTitle(transactionEdited == nil ? "Create Transaction" : "Edit Transaction")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                Button(action: {
+                Button("Cancel") {
                     dismiss()
-                }, label: {
-                    Text("Cancel")
-                })
+                }
             }
             ToolbarItem(placement: .primaryAction) {
-                Button(action: {
-                    do {
-                        try modelContext.save()
-                    } catch {
-                        fatalError("Error saving: \(error)")
-                    }
-                }, label: {
-                    Text( transactionEdited == nil ? "Save" : "Update")
+                Button(transactionEdited == nil ? "Save" : "Update") {
+                    saveTransaction()
+                    dismiss()
                 }
-                )
-                .disabled(amount == nil)
+                .disabled(!amountValid)
             }
         }
     }
+    
+    private func saveTransaction() {
+            guard let amount = amount else { return }
+            
+            if let transaction = transactionEdited {
+                // Update existing transaction
+                transaction.amount = amount
+                print("Updating transaction with amount: \(amount)")
+            } else {
+                // Insert new transaction
+                let newTransaction = Transaction(amount: amount)
+                modelContext.insert(newTransaction)
+                print("Creating new transaction with amount: \(amount)")
+            }
+            
+            // Attempt to save changes to the model context
+            do {
+                try modelContext.save()
+                print("Transaction saved successfully")
+            } catch {
+                print("Failed to save transaction: \(error.localizedDescription)")
+            }
+        }
 }
 
 #Preview("Edit Transaction") {

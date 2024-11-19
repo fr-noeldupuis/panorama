@@ -22,8 +22,11 @@ struct panoramaApp: App {
     }
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .modelContainer(container)
+            NavigationView {
+                TransactionListView()
+            }
+                
         }
+        .modelContainer(container)
     }
 }

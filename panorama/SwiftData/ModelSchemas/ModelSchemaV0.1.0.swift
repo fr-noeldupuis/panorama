@@ -21,10 +21,13 @@ enum ModelSchemaV0_1_0: VersionedSchema {
     }
     
     @Model
-    class Transaction {
+    class Transaction: Identifiable {
+        
+        var id: UUID
         var amount: Double
         
         init(amount: Double = 0) {
+            self.id = .init()
             self.amount = amount
         }
         
