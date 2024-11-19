@@ -12,7 +12,7 @@ import OrderedCollections
 struct TransactionListView: View {
     
     @Environment(\.modelContext) private var modelContext
-    @Query var transactions: [Transaction]
+    @Query(sort: \Transaction.date, order: .reverse) var transactions: [Transaction]
     
     // Custom date formatter for the "DD mmmm yyyy" format
     private let dateFormatter: DateFormatter = {
@@ -46,7 +46,6 @@ struct TransactionListView: View {
                 }
             }
         }
-        .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)) // Reduce row insets to adjust padding
         .navigationTitle("Transactions")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {

@@ -78,6 +78,7 @@ struct EditTransactionView: View {
             if let transaction = transactionEdited {
                 // Update existing transaction
                 transaction.amount = amount
+                transaction.date = transactionDate
                 print("Updating transaction with amount: \(amount)")
             } else {
                 // Insert new transaction
