@@ -41,7 +41,7 @@ struct EditTransactionView: View {
                     }
                     !amountPristine && !amountValid ? Text("Amount is required and must be numeric.")
                         .foregroundColor(.red)
-                        .font(.system(size: 12))
+                        .font(.system(size: 11))
                         .frame(maxWidth: .infinity, alignment: .trailing) : nil
                 }
             }
