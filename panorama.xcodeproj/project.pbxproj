@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		6FDAA4DE2CECA51E00A53FC2 /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 6FDAA4DD2CECA51E00A53FC2 /* OrderedCollections */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		6FDAA4BE2CEB657E00A53FC2 /* panorama.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = panorama.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6FDAA4DE2CECA51E00A53FC2 /* OrderedCollections in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -33,6 +38,7 @@
 			isa = PBXGroup;
 			children = (
 				6FDAA4C02CEB657E00A53FC2 /* panorama */,
+				6FDAA4DC2CECA51E00A53FC2 /* Frameworks */,
 				6FDAA4BF2CEB657E00A53FC2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -43,6 +49,13 @@
 				6FDAA4BE2CEB657E00A53FC2 /* panorama.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		6FDAA4DC2CECA51E00A53FC2 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -65,6 +78,7 @@
 			);
 			name = panorama;
 			packageProductDependencies = (
+				6FDAA4DD2CECA51E00A53FC2 /* OrderedCollections */,
 			);
 			productName = panorama;
 			productReference = 6FDAA4BE2CEB657E00A53FC2 /* panorama.app */;
@@ -94,6 +108,9 @@
 			);
 			mainGroup = 6FDAA4B52CEB657E00A53FC2;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				6FDAA4DB2CECA42700A53FC2 /* XCRemoteSwiftPackageReference "swift-collections" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6FDAA4BF2CEB657E00A53FC2 /* Products */;
 			projectDirPath = "";
@@ -324,6 +341,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		6FDAA4DB2CECA42700A53FC2 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6FDAA4DD2CECA51E00A53FC2 /* OrderedCollections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6FDAA4DB2CECA42700A53FC2 /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = OrderedCollections;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6FDAA4B62CEB657E00A53FC2 /* Project object */;
 }
