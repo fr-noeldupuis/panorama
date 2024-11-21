@@ -86,7 +86,7 @@ struct EditTransactionView: View {
                 transaction.transactionDescription = transactionDescription
             } else {
                 // Insert new transaction
-                let newTransaction = Transaction(amount: amount, date: transactionDate, description: transactionDescription)
+                let newTransaction = Transaction(amount: amount, date: transactionDate, description: transactionDescription, category: Category(name: "Food", iconName: "questionmark"))
                 modelContext.insert(newTransaction)
             }
             
@@ -101,7 +101,7 @@ struct EditTransactionView: View {
 
 #Preview("Edit Transaction") {
     NavigationView {
-        EditTransactionView(transactionEdited: Transaction(amount: 24.0, date: .now, description: "Dinner"))
+        EditTransactionView(transactionEdited: Transaction(amount: 24.0, date: .now, description: "Dinner", category: Category(name: "Food", iconName: "questionmark")))
             .modelContainer(for: Transaction.self, inMemory: true)
     }
 }

@@ -81,7 +81,7 @@ struct TransactionListView: View {
     container.mainContext.insert(
         Transaction(
             amount: 17, date: Calendar.current.date(from: comps1)!,
-            description: "Test 00"))
+            description: "Test 00", category: Category(name: "Food", iconName: "globe")))
 
     var comps2 = DateComponents()
     comps2.day = 21
@@ -91,16 +91,16 @@ struct TransactionListView: View {
     container.mainContext.insert(
         Transaction(
             amount: -20, date: Calendar.current.date(from: comps2)!,
-            description: "Test 1"))
+            description: "Test 1", category: Category(name: "Food", iconName: "questionmark")))
     container.mainContext.insert(
-        Transaction(amount: -250, date: Calendar.current.date(from: comps2)!))
+        Transaction(amount: -250, date: Calendar.current.date(from: comps2)!, category: Category(name: "Food", iconName: "bolt.heart.fill")))
     container.mainContext.insert(
         Transaction(
             amount: 220, date: Calendar.current.date(from: comps2)!,
-            description: "Test 3"))
+            description: "Test 3", category: Category(name: "Food", iconName: "flag.pattern.checkered")))
 
     container.mainContext.insert(
-        Transaction(amount: 17.54, date: Calendar.current.startOfDay(for: .now))
+        Transaction(amount: 17.54, date: Calendar.current.startOfDay(for: .now), category: Category(name: "Food", iconName: "pentagon.righthalf.filled"))
     )
 
     return NavigationStack {

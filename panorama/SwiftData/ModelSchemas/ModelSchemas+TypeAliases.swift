@@ -7,4 +7,5 @@
 
 import Foundation
 
-typealias Transaction = ModelSchemaV0_1_0.Transaction
+typealias Transaction = ModelSchemaV0_2_0.Transaction
+typealias Category = ModelSchemaV0_2_0.Category
