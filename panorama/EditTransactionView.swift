@@ -14,6 +14,10 @@ struct EditTransactionView: View {
     
     @State private var transactionDescription: String = ""
     
+    @State private var category: String
+    
+    @State private var categoryIconName: String
+    
     var transactionEdited: Transaction?
     
     init(transactionEdited: Transaction? = nil) {
@@ -22,11 +26,13 @@ struct EditTransactionView: View {
         _amountValid = State(initialValue: transactionEdited?.amount != nil)
         _transactionDate = State(initialValue: transactionEdited?.date ?? Calendar.current.startOfDay(for: .now))
         _transactionDescription = State(initialValue: transactionEdited?.transactionDescription ?? "")
+        _category = State(initialValue: transactionEdited?.category?.name ?? "No category")
+        _categoryIconName = State(initialValue: transactionEdited?.category?.iconName ?? "questionmark")
     }
     
     var body: some View {
         Form {
-            Section {
+            Section(header: Text("Transaction")) {
                 VStack {
                     HStack {
                         Text("Amount")
@@ -54,6 +60,25 @@ struct EditTransactionView: View {
                     Text("Date")
                 }
                 TextField("Description", text: $transactionDescription).foregroundColor(.secondary)
+            }
+            
+            Section(header: Text("Category")) {
+                HStack {
+                    Text("Name")
+                    Spacer()
+                    TextField("Enter category name", text: $category)
+                        .multilineTextAlignment(.trailing)
+                }
+                HStack {
+                    Text("Icon name")
+                    Spacer()
+                    TextField("Enter icon name", text: $categoryIconName)
+                        .multilineTextAlignment(.trailing)
+                        .autocorrectionDisabled(true)
+                        .autocapitalization(.none)
+                        .textInputAutocapitalization(.never)
+                        
+                }
             }
         }
         .navigationTitle(transactionEdited == nil ? "Create Transaction" : "Edit Transaction")
@@ -84,9 +109,11 @@ struct EditTransactionView: View {
                 transaction.amount = amount
                 transaction.date = transactionDate
                 transaction.transactionDescription = transactionDescription
+                transaction.category?.name = category.isEmpty ? "No category" : category
+                transaction.category?.iconName = categoryIconName.isEmpty ? "questionmark" : categoryIconName
             } else {
                 // Insert new transaction
-                let newTransaction = Transaction(amount: amount, date: transactionDate, description: transactionDescription, category: Category(name: "Food", iconName: "questionmark"))
+                let newTransaction = Transaction(amount: amount, date: transactionDate, description: transactionDescription, category: Category(name: category.isEmpty ? "No category" : category, iconName: categoryIconName.isEmpty ? "questionmark" : categoryIconName))
                 modelContext.insert(newTransaction)
             }
             
