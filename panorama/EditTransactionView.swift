@@ -12,6 +12,8 @@ struct EditTransactionView: View {
     
     @State private var transactionDate: Date
     
+    @State private var transactionDescription: String = ""
+    
     var transactionEdited: Transaction?
     
     init(transactionEdited: Transaction? = nil) {
@@ -19,6 +21,7 @@ struct EditTransactionView: View {
         _amount = State(initialValue: transactionEdited?.amount)
         _amountValid = State(initialValue: transactionEdited?.amount != nil)
         _transactionDate = State(initialValue: transactionEdited?.date ?? Calendar.current.startOfDay(for: .now))
+        _transactionDescription = State(initialValue: transactionEdited?.transactionDescription ?? "")
     }
     
     var body: some View {
@@ -50,6 +53,7 @@ struct EditTransactionView: View {
                 DatePicker(selection: $transactionDate, displayedComponents: .date) {
                     Text("Date")
                 }
+                TextField("Description", text: $transactionDescription).foregroundColor(.secondary)
             }
         }
         .navigationTitle(transactionEdited == nil ? "Create Transaction" : "Edit Transaction")
@@ -79,18 +83,16 @@ struct EditTransactionView: View {
                 // Update existing transaction
                 transaction.amount = amount
                 transaction.date = transactionDate
-                print("Updating transaction with amount: \(amount)")
+                transaction.transactionDescription = transactionDescription
             } else {
                 // Insert new transaction
-                let newTransaction = Transaction(amount: amount, date: transactionDate)
+                let newTransaction = Transaction(amount: amount, date: transactionDate, description: transactionDescription)
                 modelContext.insert(newTransaction)
-                print("Creating new transaction with amount: \(amount)")
             }
             
             // Attempt to save changes to the model context
             do {
                 try modelContext.save()
-                print("Transaction saved successfully")
             } catch {
                 print("Failed to save transaction: \(error.localizedDescription)")
             }
@@ -99,7 +101,7 @@ struct EditTransactionView: View {
 
 #Preview("Edit Transaction") {
     NavigationView {
-        EditTransactionView(transactionEdited: Transaction(amount: 24.0, date: .now))
+        EditTransactionView(transactionEdited: Transaction(amount: 24.0, date: .now, description: "Dinner"))
             .modelContainer(for: Transaction.self, inMemory: true)
     }
 }

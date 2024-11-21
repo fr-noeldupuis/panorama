@@ -26,11 +26,13 @@ enum ModelSchemaV0_1_0: VersionedSchema {
         var id: UUID
         var amount: Double
         var date: Date
+        var transactionDescription: String
         
-        init(amount: Double = 0, date: Date) {
+        init(amount: Double = 0, date: Date, description: String = "") {
             self.id = .init()
             self.amount = amount
             self.date = date
+            self.transactionDescription = description
         }
         
     }
