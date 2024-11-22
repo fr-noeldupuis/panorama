@@ -58,11 +58,11 @@ struct TransactionListRowView: View {
 #Preview {
     NavigationStack {
         List {
-            TransactionListRowView(transaction: Transaction(amount: 13.70005, date: .now, description: "Test transaction description", category: Category(name: "Food", iconName: "wrench.and.screwdriver.fill")))
-            TransactionListRowView(transaction: Transaction(amount: -13.75, date: .now, description: "Test transaction description", category: Category(name: "Salary", iconName: "australian.football.fill")))
-            TransactionListRowView(transaction: Transaction(amount: 13.7, date: .now, description: "Test transaction description", category: Category(name: "Expense", iconName: "globe")))
-            TransactionListRowView(transaction: Transaction(amount: 13, date: .now, description: "Test transaction description", category: Category(name: "Bismillah", iconName: "questionmark")))
-            TransactionListRowView(transaction: Transaction(amount: 13, date: .now, description: "", category: Category(name: "Food", iconName: "questionmark")))
+            TransactionListRowView(transaction: Transaction(amount: 13.70005, date: .now, description: "Test transaction description", category: Category(name: "Food", iconName: "wrench.and.screwdriver.fill", type: "income")))
+            TransactionListRowView(transaction: Transaction(amount: -13.75, date: .now, description: "Test transaction description", category: Category(name: "Salary", iconName: "australian.football.fill", type: "expense")))
+            TransactionListRowView(transaction: Transaction(amount: 13.7, date: .now, description: "Test transaction description", category: Category(name: "Expense", iconName: "globe", type: "income")))
+            TransactionListRowView(transaction: Transaction(amount: 13, date: .now, description: "Test transaction description", category: Category(name: "Bismillah", iconName: "questionmark", type: "income")))
+            TransactionListRowView(transaction: Transaction(amount: 13, date: .now, description: "", category: Category(name: "Food", iconName: "questionmark", type: "income")))
         }
     }
 }

@@ -45,11 +45,13 @@ enum ModelSchemaV0_2_0: VersionedSchema {
         var id: UUID
         var name: String
         var iconName: String
+        var type: String
         
-        init(name: String, iconName: String) {
+        init(name: String, iconName: String, type: String) {
             self.id = .init()
             self.name = name
             self.iconName = iconName
+            self.type = type
         }
     }
 }
