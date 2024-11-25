@@ -14,6 +14,8 @@ struct TransactionListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Transaction.date, order: .reverse) var transactions:
         [Transaction]
+    
+    @Query var accounts: [Account]
 
     // Custom date formatter for the "DD mmmm yyyy" format
     private let dateFormatter: DateFormatter = {
@@ -53,6 +55,7 @@ struct TransactionListView: View {
                             }
                     }
                 }
+                
             }
         }
         .navigationTitle("Transactions")
@@ -69,42 +72,10 @@ struct TransactionListView: View {
 
 #Preview {
 
-    let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(
-        for: Transaction.self, configurations: configuration)
-
-    var comps1 = DateComponents()
-    comps1.day = 21
-    comps1.month = 10
-    comps1.year = 2020
-
-    container.mainContext.insert(
-        Transaction(
-            amount: 17, date: Calendar.current.date(from: comps1)!,
-            description: "Test 00", category: Category(name: "Food", iconName: "globe", type: "income")))
-
-    var comps2 = DateComponents()
-    comps2.day = 21
-    comps2.month = 3
-    comps2.year = 2022
-
-    container.mainContext.insert(
-        Transaction(
-            amount: -20, date: Calendar.current.date(from: comps2)!,
-            description: "Test 1", category: Category(name: "Food", iconName: "questionmark", type: "expense")))
-    container.mainContext.insert(
-        Transaction(amount: -250, date: Calendar.current.date(from: comps2)!, category: Category(name: "Food", iconName: "bolt.heart.fill", type: "expense")))
-    container.mainContext.insert(
-        Transaction(
-            amount: 220, date: Calendar.current.date(from: comps2)!,
-            description: "Test 3", category: Category(name: "Food", iconName: "flag.pattern.checkered", type: "income")))
-
-    container.mainContext.insert(
-        Transaction(amount: 17.54, date: Calendar.current.startOfDay(for: .now), category: Category(name: "Food", iconName: "pentagon.righthalf.filled", type: "income"))
-    )
+    
 
     return NavigationStack {
         TransactionListView()
-            .modelContainer(container)
+            .modelContainer(PreviewContentData.generateContainer(incomeCategoriesCount: 5, expenseCategoryCount:7, accountsCount: 10, transactionCount: 1500))
     }
 }

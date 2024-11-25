@@ -20,6 +20,10 @@ struct EditTransactionView: View {
     
     @State private var categoryType: String
     
+    @State private var accountName: String
+    @State private var accountIconString: String
+    
+    
     var transactionEdited: Transaction?
     
     init(transactionEdited: Transaction? = nil) {
@@ -31,6 +35,8 @@ struct EditTransactionView: View {
         _category = State(initialValue: transactionEdited?.category?.name ?? "No category")
         _categoryIconName = State(initialValue: transactionEdited?.category?.iconName ?? "questionmark")
         _categoryType = State(initialValue: transactionEdited?.category?.type ?? "income")
+        _accountName = State(initialValue: transactionEdited?.account?.name ?? "No account")
+        _accountIconString = State(initialValue: transactionEdited?.account?.iconName ?? "questionmark")
     }
     
     var body: some View {
@@ -90,6 +96,27 @@ struct EditTransactionView: View {
                 }
 
             }
+            
+            
+            Section(header: Text("Account")) {
+                HStack {
+                    Text("Name")
+                    Spacer()
+                    TextField("Enter account name", text: $accountName)
+                        .multilineTextAlignment(.trailing)
+                }
+                HStack {
+                    Text("Icon name")
+                    Spacer()
+                    TextField("Enter icon name", text: $accountIconString)
+                        .multilineTextAlignment(.trailing)
+                        .autocorrectionDisabled(true)
+                        .autocapitalization(.none)
+                        .textInputAutocapitalization(.never)
+                        
+                }
+
+            }
         }
         .navigationTitle(transactionEdited == nil ? "Create Transaction" : "Edit Transaction")
         .navigationBarTitleDisplayMode(.inline)
@@ -122,9 +149,11 @@ struct EditTransactionView: View {
                 transaction.category?.name = category.isEmpty ? "No category" : category
                 transaction.category?.iconName = categoryIconName.isEmpty ? "questionmark" : categoryIconName
                 transaction.category?.type = categoryType
+                transaction.account?.name = accountName.isEmpty ? "No Account" : accountName
+                transaction.account?.iconName = accountIconString.isEmpty ? "questionmark" : accountIconString
             } else {
                 // Insert new transaction
-                let newTransaction = Transaction(amount: categoryType == "income" ? amount : -amount, date: transactionDate, description: transactionDescription, category: Category(name: category.isEmpty ? "No category" : category, iconName: categoryIconName.isEmpty ? "questionmark" : categoryIconName, type: categoryType))
+                let newTransaction = Transaction(amount: categoryType == "income" ? amount : -amount, date: transactionDate, description: transactionDescription, category: Category(name: category.isEmpty ? "No category" : category, iconName: categoryIconName.isEmpty ? "questionmark" : categoryIconName, type: categoryType, transactions: []), account: Account(name: accountName.isEmpty ? "No Account" : accountName, iconName:accountIconString.isEmpty ? "questionmark" : accountIconString, transactions: []))
                 modelContext.insert(newTransaction)
             }
             
@@ -139,7 +168,7 @@ struct EditTransactionView: View {
 
 #Preview("Edit Transaction") {
     NavigationView {
-        EditTransactionView(transactionEdited: Transaction(amount: 24.0, date: .now, description: "Dinner", category: Category(name: "Food", iconName: "questionmark", type: "income")))
+        EditTransactionView(transactionEdited: Transaction(amount: 24.0, date: .now, description: "Dinner", category: Category(name: "Food", iconName: "questionmark", type: "income", transactions: []), account: Account(name: "Bank", iconName: "dollarsign.bank.building.fill", transactions: [])))
             .modelContainer(for: Transaction.self, inMemory: true)
     }
 }
