@@ -28,6 +28,7 @@ struct CategoriesListView: View {
                             Spacer()
                             Text("\(formatAmountToString(amount: amount)) €")
                                 .foregroundColor(category.type == "expense" ? .red : .green)
+                                .font(.headline)
                         }
                     }
                 }
