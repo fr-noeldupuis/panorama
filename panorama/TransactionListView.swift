@@ -10,6 +10,8 @@ import SwiftData
 import SwiftUI
 
 struct TransactionListView: View {
+    
+    @ObservedObject var coordinator: TabCoordinator
 
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Transaction.date, order: .reverse) var transactions:
@@ -71,8 +73,10 @@ struct TransactionListView: View {
 }
 
 #Preview {
-    NavigationStack {
-        TransactionListView()
-            .modelContainer(PreviewContentData.generateContainer(incomeCategoriesCount: 5, expenseCategoryCount:7, accountsCount: 10, transactionCount: 1500))
+    let mockCoordinator = TabCoordinator()
+    
+    NavigationStack(path: .constant(mockCoordinator.transactionsNavigationPath)) {
+        TransactionListView(coordinator: mockCoordinator)
+            .modelContainer(PreviewContentData.generateContainer(incomeCategoriesCount: 5, expenseCategoryCount:7, accountsCount: 10, transactionCount: 150))
     }
 }
