@@ -161,7 +161,7 @@ struct PreviewContentData {
         dateFormatter.dateFormat = "yyyy-MM-dd"
         
         for i in 1...transactionCount {
-            let amount = Double.random(in: 1...1000)
+            let amount = round(Double.random(in: 1...1000) * 100) / 100
             let date = Calendar.current.startOfDay(for: randomDate(from: dateFormatter.date(from: "2024-10-01")!, to: dateFormatter.date(from: "2024-12-31")!)!)
             let description = "Description \(i)"
             let category = categoriesList.randomElement()!

@@ -5,6 +5,9 @@ struct EditTransactionView: View {
     
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
+    
+    @Query private var categories: [Category]
+    @Query private var accounts: [Account]
 
     @State private var amount: Double?
     @State private var amountPristine: Bool = true
@@ -15,10 +18,12 @@ struct EditTransactionView: View {
     @State private var transactionDescription: String = ""
     
     @State private var category: String
-    
     @State private var categoryIconName: String
-    
     @State private var categoryType: String
+    
+    @State private var selectedCategory: Category?
+    
+    @State private var selectedAccount: Account?
     
     @State private var accountName: String
     @State private var accountIconString: String
@@ -37,6 +42,8 @@ struct EditTransactionView: View {
         _categoryType = State(initialValue: transactionEdited?.category?.type ?? "income")
         _accountName = State(initialValue: transactionEdited?.account?.name ?? "No account")
         _accountIconString = State(initialValue: transactionEdited?.account?.iconName ?? "questionmark")
+        _selectedCategory = State(initialValue: transactionEdited?.category)
+        _selectedAccount = State(initialValue: transactionEdited?.account)
     }
     
     var body: some View {
@@ -72,48 +79,25 @@ struct EditTransactionView: View {
             }
             
             Section(header: Text("Category")) {
-                HStack {
-                    Text("Name")
-                    Spacer()
-                    TextField("Enter category name", text: $category)
-                        .multilineTextAlignment(.trailing)
-                }
-                HStack {
-                    Text("Icon name")
-                    Spacer()
-                    TextField("Enter icon name", text: $categoryIconName)
-                        .multilineTextAlignment(.trailing)
-                        .autocorrectionDisabled(true)
-                        .autocapitalization(.none)
-                        .textInputAutocapitalization(.never)
-                        
-                }
-                Picker(selection: $categoryType) {
-                    Text("Income").tag("income")
-                    Text("Expense").tag("expense")
+                
+                Picker(selection: $selectedCategory) {
+                    ForEach(categories) { category in
+                        Text("\(category.name) - \(category.type)").tag(category)
+                    }
                 } label: {
-                    Text("Category type")
+                    Text("Category")
                 }
 
             }
             
             
             Section(header: Text("Account")) {
-                HStack {
-                    Text("Name")
-                    Spacer()
-                    TextField("Enter account name", text: $accountName)
-                        .multilineTextAlignment(.trailing)
-                }
-                HStack {
-                    Text("Icon name")
-                    Spacer()
-                    TextField("Enter icon name", text: $accountIconString)
-                        .multilineTextAlignment(.trailing)
-                        .autocorrectionDisabled(true)
-                        .autocapitalization(.none)
-                        .textInputAutocapitalization(.never)
-                        
+                Picker(selection: $selectedAccount) {
+                    ForEach(accounts) { account in
+                        Text(account.name).tag(account)
+                    }
+                } label: {
+                    Text("Account")
                 }
 
             }
@@ -146,14 +130,11 @@ struct EditTransactionView: View {
                 transaction.amount = categoryType == "income" ? amount : -amount
                 transaction.date = transactionDate
                 transaction.transactionDescription = transactionDescription
-                transaction.category?.name = category.isEmpty ? "No category" : category
-                transaction.category?.iconName = categoryIconName.isEmpty ? "questionmark" : categoryIconName
-                transaction.category?.type = categoryType
-                transaction.account?.name = accountName.isEmpty ? "No Account" : accountName
-                transaction.account?.iconName = accountIconString.isEmpty ? "questionmark" : accountIconString
+                transaction.category = selectedCategory
+                transaction.account = selectedAccount
             } else {
                 // Insert new transaction
-                let newTransaction = Transaction(amount: categoryType == "income" ? amount : -amount, date: transactionDate, description: transactionDescription, category: Category(name: category.isEmpty ? "No category" : category, iconName: categoryIconName.isEmpty ? "questionmark" : categoryIconName, type: categoryType, transactions: []), account: Account(name: accountName.isEmpty ? "No Account" : accountName, iconName:accountIconString.isEmpty ? "questionmark" : accountIconString, transactions: []))
+                let newTransaction = Transaction(amount: categoryType == "income" ? amount : -amount, date: transactionDate, description: transactionDescription, category: selectedCategory, account: selectedAccount)
                 modelContext.insert(newTransaction)
             }
             
@@ -167,15 +148,23 @@ struct EditTransactionView: View {
 }
 
 #Preview("Edit Transaction") {
-    NavigationView {
-        EditTransactionView(transactionEdited: Transaction(amount: 24.0, date: .now, description: "Dinner", category: Category(name: "Food", iconName: "questionmark", type: "income", transactions: []), account: Account(name: "Bank", iconName: "dollarsign.bank.building.fill", transactions: [])))
-            .modelContainer(for: Transaction.self, inMemory: true)
+    let container = PreviewContentData.generateContainer()
+    
+    let account = Account(name: "Bank", iconName: "dollarsign.bank.building.fill", transactions: [])
+    container.mainContext.insert(account)
+    
+    let category = Category(name: "Salary", iconName: "dollarsign.bank.building.fill", type: "income", transactions: [])
+    container.mainContext.insert(category)
+
+    return NavigationView {
+        EditTransactionView(transactionEdited: Transaction(amount: 24.0, date: .now, description: "Dinner", category: category, account: account))
+            .modelContainer(container)
     }
 }
 
 #Preview("Create Transaction") {
     NavigationView {
         EditTransactionView()
-            .modelContainer(for: Transaction.self, inMemory: true)
+            .modelContainer(PreviewContentData.generateContainer())
     }
 }

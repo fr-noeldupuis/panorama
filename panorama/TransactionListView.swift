@@ -71,10 +71,7 @@ struct TransactionListView: View {
 }
 
 #Preview {
-
-    
-
-    return NavigationStack {
+    NavigationStack {
         TransactionListView()
             .modelContainer(PreviewContentData.generateContainer(incomeCategoriesCount: 5, expenseCategoryCount:7, accountsCount: 10, transactionCount: 1500))
     }
