@@ -32,6 +32,12 @@ struct AccountsListView: View {
                 }
             }
         }
+        .navigationTitle("Accounts")
+        .toolbar {
+            ToolbarItem {
+                Image(systemName: "plus")
+            }
+        }
     }
     
     func formatAmountToString(amount: Double) -> String {
