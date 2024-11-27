@@ -15,7 +15,7 @@ struct panoramaApp: App {
     
     init() {
         do {
-            container = try ModelContainer(for: Transaction.self, Category.self, migrationPlan: nil)
+            container = try ModelContainer(for: Transaction.self, Category.self, migrationPlan: PanoramaMigrationPlan.self)
         } catch {
             fatalError("Faile to initialize model container.")
         }

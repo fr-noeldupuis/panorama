@@ -15,14 +15,14 @@ struct EditCategoryView: View {
     
     @State private var name: String
     
-    @State private var type: String
+    @State private var type: CategoryType
     
     @State private var iconName: String
     
     
     init(editedCategory: Category? = nil) {
         _name = State(initialValue: editedCategory?.name ?? "")
-        _type = State(initialValue: editedCategory?.type ?? "income")
+        _type = State(initialValue: editedCategory?.type ?? .income)
         _iconName = State(initialValue: editedCategory?.iconName ?? sfSymbolsList.prefix(10).randomElement()!)
         self.editedCategory = editedCategory
     }
@@ -43,8 +43,8 @@ struct EditCategoryView: View {
                         .multilineTextAlignment(.trailing)
                 }
                 Picker(selection: $type) {
-                    Text("Income").tag("income")
-                    Text("Expense").tag("expense")
+                    Text("Income").tag(CategoryType.income)
+                    Text("Expense").tag(CategoryType.expense)
                 } label: {
                     Text("Category type")
                 }
@@ -126,13 +126,13 @@ struct EditCategoryView: View {
 
 #Preview("Edit category (income)") {
     NavigationStack {
-        EditCategoryView(editedCategory: Category(name: "Test Category", iconName: sfSymbolsList.prefix(10).randomElement()!, type: "income", transactions: []))
+        EditCategoryView(editedCategory: Category(name: "Test Category", iconName: sfSymbolsList.prefix(10).randomElement()!, type: .income, transactions: []))
     }
 }
 
 #Preview("Edit category (expense)") {
     NavigationStack {
-        EditCategoryView(editedCategory: Category(name: "Test Category", iconName: sfSymbolsList.prefix(10).randomElement()!, type: "expense", transactions: []))
+        EditCategoryView(editedCategory: Category(name: "Test Category", iconName: sfSymbolsList.prefix(10).randomElement()!, type: .expense, transactions: []))
     }
 }
 

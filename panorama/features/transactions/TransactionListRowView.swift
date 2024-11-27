@@ -16,7 +16,7 @@ struct TransactionListRowView: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 5)
                         .frame(width: 50, height: 40)
-                        .foregroundColor(transaction.category?.type == "income" ? .green : .red)
+                        .foregroundColor(transaction.category?.type == .income ? .green : .red)
                         .opacity(0.8)
                     Image(systemName: transaction.category?.iconName ?? "questionmark.circle")
                 }
@@ -68,11 +68,11 @@ struct TransactionListRowView: View {
 #Preview {
     NavigationStack {
         List {
-            TransactionListRowView(transaction: Transaction(amount: 13.70005, date: .now, description: "Test transaction description", category: Category(name: "Food", iconName: "wrench.and.screwdriver.fill", type: "income", transactions: []), account: Account(name: "Bank", iconName: "dollarsign.bank.building.fill", transactions: [])))
-            TransactionListRowView(transaction: Transaction(amount: -13.75, date: .now, description: "Test transaction description", category: Category(name: "Salary", iconName: "australian.football.fill", type: "expense", transactions: []), account: Account(name: "Bank", iconName: "dollarsign.bank.building.fill", transactions: [])))
-            TransactionListRowView(transaction: Transaction(amount: 13.7, date: .now, description: "Test transaction description", category: Category(name: "Expense", iconName: "globe", type: "income", transactions: []), account: Account(name: "Bank", iconName: "dollarsign.bank.building.fill", transactions: [])))
-            TransactionListRowView(transaction: Transaction(amount: 13, date: .now, description: "Test transaction description", category: Category(name: "Bismillah", iconName: "questionmark", type: "income", transactions: []), account: Account(name: "Bank", iconName: "dollarsign.bank.building.fill", transactions: [])))
-            TransactionListRowView(transaction: Transaction(amount: 13, date: .now, description: "", category: Category(name: "Food", iconName: "questionmark", type: "income", transactions: []), account: Account(name: "Bank", iconName: "dollarsign.bank.building.fill", transactions: [])))
+            TransactionListRowView(transaction: Transaction(amount: 13.70005, date: .now, description: "Test transaction description", category: Category(name: "Food", iconName: "wrench.and.screwdriver.fill", type: .income, transactions: []), account: Account(name: "Bank", iconName: "dollarsign.bank.building.fill", transactions: [])))
+            TransactionListRowView(transaction: Transaction(amount: -13.75, date: .now, description: "Test transaction description", category: Category(name: "Salary", iconName: "australian.football.fill", type: .expense, transactions: []), account: Account(name: "Bank", iconName: "dollarsign.bank.building.fill", transactions: [])))
+            TransactionListRowView(transaction: Transaction(amount: 13.7, date: .now, description: "Test transaction description", category: Category(name: "Expense", iconName: "globe", type: .income, transactions: []), account: Account(name: "Bank", iconName: "dollarsign.bank.building.fill", transactions: [])))
+            TransactionListRowView(transaction: Transaction(amount: 13, date: .now, description: "Test transaction description", category: Category(name: "Bismillah", iconName: "questionmark", type: .income, transactions: []), account: Account(name: "Bank", iconName: "dollarsign.bank.building.fill", transactions: [])))
+            TransactionListRowView(transaction: Transaction(amount: 13, date: .now, description: "", category: Category(name: "Food", iconName: "questionmark", type: .income, transactions: []), account: Account(name: "Bank", iconName: "dollarsign.bank.building.fill", transactions: [])))
         }
     }
 }

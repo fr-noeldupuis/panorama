@@ -15,8 +15,8 @@ struct CategoriesListView: View {
     
     var body: some View {
         List {
-            ForEach(Dictionary(grouping: categories, by: \.type).sorted(by: { $0.key < $1.key }), id: \.key) { type, categoriesByType in
-                Section(header: Text(type.uppercased())) {
+            ForEach(Dictionary(grouping: categories, by: \.type).sorted(by: { $0.key.rawValue < $1.key.rawValue }), id: \.key) { type, categoriesByType in
+                Section(header: Text(type.rawValue.uppercased())) {
                     ForEach(categoriesByType) { category in
                         CategoriesListRowView(category: category)
                         

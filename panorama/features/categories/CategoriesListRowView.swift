@@ -20,7 +20,7 @@ struct CategoriesListRowView: View {
             HStack {
                 ZStack {
                     RoundedRectangle(cornerRadius: 5)
-                        .foregroundColor(category.type == "expense" ? .red : .green)
+                        .foregroundColor(category.type == .expense ? .red : .green)
                     Image(systemName: category.iconName)
                         .font(.system(size: 24))
                 }
@@ -30,7 +30,7 @@ struct CategoriesListRowView: View {
                 }
                 Spacer()
                 Text("\(formatAmountToString(amount: amount)) €")
-                    .foregroundColor(category.type == "expense" ? .red : .green)
+                    .foregroundColor(category.type == .expense ? .red : .green)
                     .font(.headline)
             }
             NavigationLink(destination: EditCategoryView(editedCategory: category)) {
