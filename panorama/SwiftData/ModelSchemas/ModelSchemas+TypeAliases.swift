@@ -7,6 +7,7 @@
 
 import Foundation
 
-typealias Transaction = ModelSchemaV0_3_0.Transaction
-typealias Category = ModelSchemaV0_3_0.Category
-typealias Account = ModelSchemaV0_3_0.Account
+typealias Transaction = ModelSchemaV0_3_2.Transaction
+typealias Category = ModelSchemaV0_3_2.Category
+typealias Account = ModelSchemaV0_3_2.Account
+typealias CategoryType = ModelSchemaV0_3_2.CategoryType

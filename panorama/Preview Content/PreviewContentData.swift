@@ -70,7 +70,7 @@ struct PreviewContentData {
         let container = try! ModelContainer(
             for: Transaction.self, configurations: configuration)
         
-        let cat1 = Category(name: "Food", iconName: "globe", type: "income", transactions: [])
+        let cat1 = Category(name: "Food", iconName: "globe", type: .income, transactions: [])
         container.mainContext.insert(cat1)
         
         let acc1 = Account(name: "Bank", iconName: "dollarsign.bank.building.fill", transactions: [])
@@ -133,7 +133,7 @@ struct PreviewContentData {
             let categoryName = Int.random(in: 0...(incomeCategoryNames.count - 1))
             let iconString = Int.random(in: 0...(sfSymbolsList.count - 1))
             
-            let category = Category(name: incomeCategoryNames[categoryName], iconName: sfSymbolsList[iconString], type: "income", transactions: [])
+            let category = Category(name: incomeCategoryNames[categoryName], iconName: sfSymbolsList[iconString], type: .income, transactions: [])
             container.mainContext.insert(category)
             categoriesList.append(category)
         }
@@ -142,7 +142,7 @@ struct PreviewContentData {
             let categoryName = Int.random(in: 0...(expenseCategoryNames.count - 1))
             let iconString = Int.random(in: 0...(sfSymbolsList.count - 1))
             
-            let category = Category(name: expenseCategoryNames[categoryName], iconName: sfSymbolsList[iconString], type: "expense", transactions: [])
+            let category = Category(name: expenseCategoryNames[categoryName], iconName: sfSymbolsList[iconString], type: .income, transactions: [])
             container.mainContext.insert(category)
             categoriesList.append(category)
         }
@@ -167,7 +167,7 @@ struct PreviewContentData {
             let category = categoriesList.randomElement()!
             let account = accountList.randomElement()!
             
-            let transaction = Transaction(amount: category.type == "expense" ? -amount : amount, date: date, description: description, category: category, account: account)
+            let transaction = Transaction(amount: category.type == .expense ? -amount : amount, date: date, description: description, category: category, account: account)
             
             container.mainContext.insert(transaction)
         }
@@ -176,7 +176,7 @@ struct PreviewContentData {
     }
     
     static let categoriesExample = [
-        Category(name: "Category 1", iconName: "questionmark", type: "expense", transactions: [])
+        Category(name: "Category 1", iconName: "questionmark", type: .expense, transactions: [])
     ]
     
     static let accountsExample =  [
