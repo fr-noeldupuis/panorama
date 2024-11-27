@@ -108,6 +108,10 @@ struct EditTransactionView: View {
                 .fontWeight(.semibold)
             }
         }
+        .onAppear {
+            selectedCategory = selectedCategory ?? categories.randomElement()
+            selectedAccount = selectedAccount ?? accounts.randomElement()
+        }
     }
     
     private func saveTransaction() {

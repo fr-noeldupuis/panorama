@@ -15,7 +15,7 @@ struct panoramaApp: App {
     
     init() {
         do {
-            container = try ModelContainer(for: Transaction.self, Category.self, migrationPlan: PanoramaMigrationPlan.self)
+            container = try ModelContainer(for: Transaction.self, migrationPlan: PanoramaMigrationPlan.self)
         } catch {
             fatalError("Faile to initialize model container.")
         }
@@ -23,7 +23,6 @@ struct panoramaApp: App {
     var body: some Scene {
         WindowGroup {
             MainTabView()
-                
         }
         .modelContainer(container)
     }
