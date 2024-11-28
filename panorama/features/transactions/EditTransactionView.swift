@@ -21,6 +21,9 @@ struct EditTransactionView: View {
     
     @State private var selectedAccount: Account?
     
+    @State private var recurringType: RecurringType
+    @State private var recurringFrequencyText: String
+    
     
     var transactionEdited: Transaction?
     
@@ -32,6 +35,9 @@ struct EditTransactionView: View {
         _transactionDescription = State(initialValue: transactionEdited?.transactionDescription ?? "")
         _selectedCategory = State(initialValue: transactionEdited?.category)
         _selectedAccount = State(initialValue: transactionEdited?.account)
+        _recurringType = State(initialValue: transactionEdited?.recurringType ?? .once)
+        _recurringFrequencyText = State(initialValue: "\(transactionEdited?.recurringFrequency ?? 1)")
+        
     }
     
     var body: some View {
@@ -87,8 +93,27 @@ struct EditTransactionView: View {
                 } label: {
                     Text("Account")
                 }
-
             }
+            
+            Section(header: Text("Repeated transaction")) {
+                Picker(selection: $recurringType) {
+                    ForEach(RecurringType.allCases) { type in
+                        Text(type.rawValue).tag(type)
+                    }
+                } label: {
+                    Text("Repeat transaction")
+                }
+                
+                if recurringType != .once {
+                    HStack {
+                        Text("Every")
+                        TextField("Frequency", text: $recurringFrequencyText)
+                            .multilineTextAlignment(.trailing)
+                    }
+                }
+            }
+            
+            
         }
         .navigationTitle(transactionEdited == nil ? "Create Transaction" : "Edit Transaction")
         .navigationBarTitleDisplayMode(.inline)
@@ -104,7 +129,13 @@ struct EditTransactionView: View {
                     saveTransaction()
                     dismiss()
                 }
-                .disabled(!amountValid)
+                .disabled(
+                    !amountValid &&
+                    (
+                        ( recurringType != .once && Int(recurringFrequencyText) != nil) ||
+                        (recurringType == .once)
+                    )
+                )
                 .fontWeight(.semibold)
             }
         }
@@ -124,9 +155,11 @@ struct EditTransactionView: View {
                 transaction.transactionDescription = transactionDescription
                 transaction.category = selectedCategory
                 transaction.account = selectedAccount
+                transaction.recurringType = recurringType
+                transaction.recurringFrequency = recurringType == .once ? nil : Int(recurringFrequencyText)!
             } else {
                 // Insert new transaction
-                let newTransaction = Transaction(amount: selectedCategory?.type == .income ? amount : -amount, date: transactionDate, description: transactionDescription, category: selectedCategory, account: selectedAccount)
+                let newTransaction = Transaction(amount: selectedCategory?.type == .income ? amount : -amount, date: transactionDate, description: transactionDescription, category: selectedCategory, account: selectedAccount, recurringType: recurringType, recurringFrequency: recurringType == .once ? nil : Int(recurringFrequencyText)!)
                 modelContext.insert(newTransaction)
             }
             
