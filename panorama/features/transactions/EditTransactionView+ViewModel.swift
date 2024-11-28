@@ -12,10 +12,21 @@ extension EditTransactionView {
     @Observable
     class ViewModel {
         
-        var modelContext: ModelContext
+        private var modelContext: ModelContext
+        
+        var accounts: [Account] = [Account]()
         
         init(modelContext: ModelContext) {
             self.modelContext = modelContext
+            fetchAccounts()
+        }
+        
+        func fetchAccounts() {
+            do {
+                accounts = try modelContext.fetch(FetchDescriptor<Account>())
+            } catch {
+                print("Error fetching Accounts: \(error.localizedDescription)")
+            }
         }
     }
 }

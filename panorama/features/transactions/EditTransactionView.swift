@@ -9,7 +9,6 @@ struct EditTransactionView: View {
     @State var viewModel: ViewModel
     
     @Query private var categories: [Category]
-    @Query private var accounts: [Account]
 
     @State private var amount: Double?
     @State private var amountPristine: Bool = true
@@ -92,7 +91,7 @@ struct EditTransactionView: View {
             
             Section(header: Text("Account")) {
                 Picker(selection: $selectedAccount) {
-                    ForEach(accounts) { account in
+                    ForEach(viewModel.accounts) { account in
                         Text(account.name).tag(account)
                     }
                 } label: {
@@ -146,7 +145,7 @@ struct EditTransactionView: View {
         }
         .onAppear {
             selectedCategory = selectedCategory ?? categories.randomElement()
-            selectedAccount = selectedAccount ?? accounts.randomElement()
+            selectedAccount = selectedAccount ?? viewModel.accounts.randomElement()
         }
     }
     
@@ -189,6 +188,7 @@ struct EditTransactionView: View {
 
     return NavigationView {
         EditTransactionView(transactionEdited: Transaction(amount: 24.0, date: .now, description: "Dinner", category: category, account: account), modelContext: container.mainContext)
+            .modelContainer(container)
     }
 }
 
@@ -197,5 +197,6 @@ struct EditTransactionView: View {
     
     return NavigationView {
         EditTransactionView(modelContext: container.mainContext)
+            .modelContainer(container)
     }
 }
