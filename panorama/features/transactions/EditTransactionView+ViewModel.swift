@@ -15,10 +15,86 @@ extension EditTransactionView {
         private var modelContext: ModelContext
         
         var accounts: [Account] = [Account]()
+        var categories: [Category] = [Category]()
         
-        init(modelContext: ModelContext) {
+        var transaction: Transaction?
+        
+        // Variables to handle amount field
+        var amountString: String
+        var amountPristine: Bool = true
+        
+        var amountStringBinding: Binding<String> {
+            Binding(
+                get: {self.amountString},
+                set: { newValue in
+                    self.amountString = newValue
+                    if (!newValue.isEmpty) {
+                        self.amountPristine = false
+                    }
+                }
+            )
+        }
+        var amountValid: Bool {
+            // amount is valid as long it's value is not nil
+            amount != nil
+        }
+        
+        var amount: Double? {
+            Double(amountString)
+        }
+        
+        // Transaction date
+        var date: Date
+        
+        // Transaction description
+        var description: String
+        
+        // Transaction category
+        var category: Category?
+        
+        // Transaction account
+        var account: Account?
+        
+        // Transaction recurring setup:
+        var recurringType: RecurringType
+        var recurringFrequencyString: String
+        var recurringFrequency: Int? {
+            Int(recurringFrequencyString)
+        }
+        
+        var recurringFrequencyValid: Bool {
+            recurringType == .once ||
+            (
+                recurringType != .once &&
+                recurringFrequency != nil
+            )
+        }
+        
+        var isFormValid: Bool {
+            amountValid &&
+            recurringFrequencyValid
+        }
+        
+        init(modelContext: ModelContext, editedTransaction: Transaction?) {
             self.modelContext = modelContext
-            fetchAccounts()
+            
+            self.transaction = editedTransaction
+            
+            self.amountString = editedTransaction?.amount.toAbsoluteAmountString() ?? ""
+            
+            self.date = editedTransaction?.date ?? Calendar.current.startOfDay(for: .now)
+            
+            self.description = editedTransaction?.transactionDescription ?? ""
+            
+            self.category = editedTransaction?.category
+            
+            self.account = editedTransaction?.account
+            
+            self.recurringType = editedTransaction?.recurringType ?? .once
+            
+            self.recurringFrequencyString = editedTransaction?.recurringFrequency != nil ? "\(editedTransaction?.recurringFrequency ?? 0)" : ""
+            
+            fetchAll()
         }
         
         func fetchAccounts() {
@@ -26,6 +102,49 @@ extension EditTransactionView {
                 accounts = try modelContext.fetch(FetchDescriptor<Account>())
             } catch {
                 print("Error fetching Accounts: \(error.localizedDescription)")
+            }
+        }
+        
+        func fetchCategories() {
+            do {
+                categories = try modelContext.fetch(FetchDescriptor<Category>())
+            } catch {
+                print("Error fetching Categories: \(error.localizedDescription)")
+            }
+        }
+        
+        func fetchAll() {
+            fetchAccounts()
+            fetchCategories()
+        }
+        
+        func saveTransaction() {
+            if (transaction != nil) {
+                // Update existing transaction
+                transaction?.amount = category!.type == .expense ? -amount! : amount!
+                transaction?.date = date
+                transaction?.transactionDescription = description
+                transaction?.category = category
+                transaction?.account = account
+                transaction?.recurringType = recurringType
+                transaction?.recurringFrequency = recurringType != .once ? recurringFrequency : nil
+            } else {
+                let transactionToInsert = Transaction(
+                    amount: category!.type == .expense ? -amount! : amount!,
+                    date: date,
+                    description: description,
+                    category: category,
+                    account: account,
+                    recurringType: recurringType,
+                    recurringFrequency: recurringType != .once ? recurringFrequency : nil)
+                modelContext.insert(transactionToInsert)
+            }
+            
+            do {
+                try modelContext.save()
+                fetchAll()
+            } catch {
+                print("Error saving model: \(error.localizedDescription)")
             }
         }
     }

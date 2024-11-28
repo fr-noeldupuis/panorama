@@ -142,7 +142,7 @@ struct PreviewContentData {
             let categoryName = Int.random(in: 0...(expenseCategoryNames.count - 1))
             let iconString = Int.random(in: 0...(sfSymbolsList.count - 1))
             
-            let category = Category(name: expenseCategoryNames[categoryName], iconName: sfSymbolsList[iconString], type: .income, transactions: [])
+            let category = Category(name: expenseCategoryNames[categoryName], iconName: sfSymbolsList[iconString], type: .expense, transactions: [])
             container.mainContext.insert(category)
             categoriesList.append(category)
         }

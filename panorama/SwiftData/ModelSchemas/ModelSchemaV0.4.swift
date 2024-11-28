@@ -96,6 +96,24 @@ enum ModelSchemaV0_4_0: VersionedSchema {
         case yearly = "Yearly"
         
         var id: Self {self}
+        
+        var unit: String {
+            return switch self {
+                case .once: ""
+                case .daily: "Day"
+            default: String(self.rawValue.dropLast(2))
+            }
+        }
+        
+        func nextOccurenceFrom(startDate: Date, frequency: Int) -> Date {
+            switch self {
+                case .once: return startDate
+                case .daily: return Calendar.current.date(byAdding: .day, value: frequency, to: startDate) ?? startDate
+                case .weekly: return Calendar.current.date(byAdding: .day, value: frequency * 7, to: startDate) ?? startDate
+                case .monthly: return Calendar.current.date(byAdding: .month, value: frequency, to: startDate) ?? startDate
+                case .yearly: return Calendar.current.date(byAdding: .year, value: frequency, to: startDate) ?? startDate
+            }
+        }
     }
 }
 

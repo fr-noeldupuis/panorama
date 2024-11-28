@@ -8,40 +8,14 @@ struct EditTransactionView: View {
     
     @State var viewModel: ViewModel
     
-    @Query private var categories: [Category]
-
-    @State private var amount: Double?
-    @State private var amountPristine: Bool = true
-    @State private var amountValid: Bool = false
-    
-    @State private var transactionDate: Date
-    
-    @State private var transactionDescription: String = ""
-    
-    @State private var selectedCategory: Category?
-    
-    @State private var selectedAccount: Account?
-    
-    @State private var recurringType: RecurringType
-    @State private var recurringFrequencyText: String
-    
     
     var transactionEdited: Transaction?
     
     init(transactionEdited: Transaction? = nil, modelContext: ModelContext) {
         self.transactionEdited = transactionEdited
         self.modelContext = modelContext
-        let viewModel = ViewModel(modelContext: modelContext)
+        let viewModel = ViewModel(modelContext: modelContext, editedTransaction: transactionEdited)
         _viewModel = State(initialValue: viewModel)
-        _amount = State(initialValue: abs(transactionEdited?.amount ?? 0))
-        _amountValid = State(initialValue: transactionEdited?.amount != nil)
-        _transactionDate = State(initialValue: transactionEdited?.date ?? Calendar.current.startOfDay(for: .now))
-        _transactionDescription = State(initialValue: transactionEdited?.transactionDescription ?? "")
-        _selectedCategory = State(initialValue: transactionEdited?.category)
-        _selectedAccount = State(initialValue: transactionEdited?.account)
-        _recurringType = State(initialValue: transactionEdited?.recurringType ?? .once)
-        _recurringFrequencyText = State(initialValue: "\(transactionEdited?.recurringFrequency ?? 1)")
-        
     }
     
     var body: some View {
@@ -51,35 +25,25 @@ struct EditTransactionView: View {
                     HStack {
                         Text("Amount")
                         Spacer()
-                        TextField("Required", text: Binding(
-                            get: { amount != nil ? String(amount!) : "" },
-                            set: { newValue in
-                                amount = Double(newValue)
-                                if !newValue.isEmpty  {
-                                    amountPristine = false
-                                }
-                                amountValid = amount != nil
-
-                            }
-                        ))
+                        TextField("Required", text: viewModel.amountStringBinding)
                         .keyboardType(.decimalPad)
                         .multilineTextAlignment(.trailing)
                     }
-                    !amountPristine && !amountValid ? Text("Amount is required and must be numeric.")
+                    (!viewModel.amountValid && !viewModel.amountPristine) ? Text("Amount is required and must be numeric.")
                         .foregroundColor(.red)
                         .font(.system(size: 11))
                         .frame(maxWidth: .infinity, alignment: .trailing) : nil
                 }
-                DatePicker(selection: $transactionDate, displayedComponents: .date) {
+                DatePicker(selection: $viewModel.date, displayedComponents: .date) {
                     Text("Date")
                 }
-                TextField("Description", text: $transactionDescription).foregroundColor(.secondary)
+                TextField("Description", text: $viewModel.description).foregroundColor(.secondary)
             }
             
             Section(header: Text("Category")) {
                 
-                Picker(selection: $selectedCategory) {
-                    ForEach(categories) { category in
+                Picker(selection: $viewModel.category) {
+                    ForEach(viewModel.categories) { category in
                         Text("\(category.name) - \(category.type.rawValue)").tag(category)
                     }
                 } label: {
@@ -90,7 +54,7 @@ struct EditTransactionView: View {
             
             
             Section(header: Text("Account")) {
-                Picker(selection: $selectedAccount) {
+                Picker(selection: $viewModel.account) {
                     ForEach(viewModel.accounts) { account in
                         Text(account.name).tag(account)
                     }
@@ -100,7 +64,7 @@ struct EditTransactionView: View {
             }
             
             Section(header: Text("Repeated transaction")) {
-                Picker(selection: $recurringType) {
+                Picker(selection: $viewModel.recurringType) {
                     ForEach(RecurringType.allCases) { type in
                         Text(type.rawValue).tag(type)
                     }
@@ -108,11 +72,18 @@ struct EditTransactionView: View {
                     Text("Repeat transaction")
                 }
                 
-                if recurringType != .once {
-                    HStack {
-                        Text("Every")
-                        TextField("Frequency", text: $recurringFrequencyText)
-                            .multilineTextAlignment(.trailing)
+                if viewModel.recurringType != .once {
+                    VStack {
+                        HStack {
+                            Text("Every")
+                            TextField("Frequency", text: $viewModel.recurringFrequencyString)
+                                .multilineTextAlignment(.trailing)
+                            Text("\(viewModel.recurringType.unit)")
+                        }
+                        !viewModel.recurringFrequencyValid ? Text("Frequency is required and must be numeric.")
+                            .foregroundColor(.red)
+                            .font(.system(size: 11))
+                            .frame(maxWidth: .infinity, alignment: .trailing) : nil
                     }
                 }
             }
@@ -130,50 +101,20 @@ struct EditTransactionView: View {
             }
             ToolbarItem(placement: .primaryAction) {
                 Button(transactionEdited == nil ? "Save" : "Update") {
-                    saveTransaction()
+                    viewModel.saveTransaction()
                     dismiss()
                 }
                 .disabled(
-                    !amountValid &&
-                    (
-                        ( recurringType != .once && Int(recurringFrequencyText) != nil) ||
-                        (recurringType == .once)
-                    )
+                    !viewModel.isFormValid
                 )
                 .fontWeight(.semibold)
             }
         }
         .onAppear {
-            selectedCategory = selectedCategory ?? categories.randomElement()
-            selectedAccount = selectedAccount ?? viewModel.accounts.randomElement()
+            viewModel.category = viewModel.category ?? viewModel.categories.randomElement()
+            viewModel.account = viewModel.account ?? viewModel.accounts.randomElement()
         }
     }
-    
-    private func saveTransaction() {
-            guard let amount = amount else { return }
-            
-            if let transaction = transactionEdited {
-                // Update existing transaction
-                transaction.amount = selectedCategory?.type == .income ? amount : -amount
-                transaction.date = transactionDate
-                transaction.transactionDescription = transactionDescription
-                transaction.category = selectedCategory
-                transaction.account = selectedAccount
-                transaction.recurringType = recurringType
-                transaction.recurringFrequency = recurringType == .once ? nil : Int(recurringFrequencyText)!
-            } else {
-                // Insert new transaction
-                let newTransaction = Transaction(amount: selectedCategory?.type == .income ? amount : -amount, date: transactionDate, description: transactionDescription, category: selectedCategory, account: selectedAccount, recurringType: recurringType, recurringFrequency: recurringType == .once ? nil : Int(recurringFrequencyText)!)
-                modelContext.insert(newTransaction)
-            }
-            
-            // Attempt to save changes to the model context
-            do {
-                try modelContext.save()
-            } catch {
-                print("Failed to save transaction: \(error.localizedDescription)")
-            }
-        }
 }
 
 #Preview("Edit Transaction") {
