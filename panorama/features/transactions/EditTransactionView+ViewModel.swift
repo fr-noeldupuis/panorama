@@ -12,5 +12,10 @@ extension EditTransactionView {
     @Observable
     class ViewModel {
         
+        var modelContext: ModelContext
+        
+        init(modelContext: ModelContext) {
+            self.modelContext = modelContext
+        }
     }
 }

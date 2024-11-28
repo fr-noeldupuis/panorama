@@ -6,6 +6,8 @@ struct EditTransactionView: View {
     @Environment(\.dismiss) var dismiss
     private var modelContext: ModelContext
     
+    @State var viewModel: ViewModel
+    
     @Query private var categories: [Category]
     @Query private var accounts: [Account]
 
@@ -30,6 +32,8 @@ struct EditTransactionView: View {
     init(transactionEdited: Transaction? = nil, modelContext: ModelContext) {
         self.transactionEdited = transactionEdited
         self.modelContext = modelContext
+        let viewModel = ViewModel(modelContext: modelContext)
+        _viewModel = State(initialValue: viewModel)
         _amount = State(initialValue: abs(transactionEdited?.amount ?? 0))
         _amountValid = State(initialValue: transactionEdited?.amount != nil)
         _transactionDate = State(initialValue: transactionEdited?.date ?? Calendar.current.startOfDay(for: .now))
