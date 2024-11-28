@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct TransactionListRowView: View {
+    
+    @Environment(\.modelContext) var modelContext
+    
     var transaction: Transaction
     
     var body: some View {
@@ -43,7 +46,7 @@ struct TransactionListRowView: View {
                     .font(.system(size: 20, weight: .medium))
                     .foregroundColor(transaction.amount >= 0 ? .green : .red)
             }
-            NavigationLink(destination: EditTransactionView(transactionEdited: transaction)) {
+            NavigationLink(destination: EditTransactionView(transactionEdited: transaction, modelContext: modelContext)) {
                 EmptyView()
             }
             .opacity(0)
@@ -74,5 +77,5 @@ struct TransactionListRowView: View {
             TransactionListRowView(transaction: Transaction(amount: 13, date: .now, description: "Test transaction description", category: Category(name: "Bismillah", iconName: "questionmark", type: .income, transactions: []), account: Account(name: "Bank", iconName: "dollarsign.bank.building.fill", transactions: [])))
             TransactionListRowView(transaction: Transaction(amount: 13, date: .now, description: "", category: Category(name: "Food", iconName: "questionmark", type: .income, transactions: []), account: Account(name: "Bank", iconName: "dollarsign.bank.building.fill", transactions: [])))
         }
-    }
+    }.modelContainer(PreviewContentData.generateContainer())
 }

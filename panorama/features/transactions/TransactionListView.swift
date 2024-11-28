@@ -64,7 +64,7 @@ struct TransactionListView: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                NavigationLink(destination: EditTransactionView()) {
+                NavigationLink(destination: EditTransactionView(modelContext: modelContext)) {
                     Image(systemName: "plus")
                 }
             }

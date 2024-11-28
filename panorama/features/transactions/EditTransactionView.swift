@@ -4,7 +4,7 @@ import SwiftData
 struct EditTransactionView: View {
     
     @Environment(\.dismiss) var dismiss
-    @Environment(\.modelContext) var modelContext
+    private var modelContext: ModelContext
     
     @Query private var categories: [Category]
     @Query private var accounts: [Account]
@@ -27,8 +27,9 @@ struct EditTransactionView: View {
     
     var transactionEdited: Transaction?
     
-    init(transactionEdited: Transaction? = nil) {
+    init(transactionEdited: Transaction? = nil, modelContext: ModelContext) {
         self.transactionEdited = transactionEdited
+        self.modelContext = modelContext
         _amount = State(initialValue: abs(transactionEdited?.amount ?? 0))
         _amountValid = State(initialValue: transactionEdited?.amount != nil)
         _transactionDate = State(initialValue: transactionEdited?.date ?? Calendar.current.startOfDay(for: .now))
@@ -173,6 +174,7 @@ struct EditTransactionView: View {
 }
 
 #Preview("Edit Transaction") {
+    
     let container = PreviewContentData.generateContainer()
     
     let account = Account(name: "Bank", iconName: "dollarsign.bank.building.fill", transactions: [])
@@ -182,14 +184,14 @@ struct EditTransactionView: View {
     container.mainContext.insert(category)
 
     return NavigationView {
-        EditTransactionView(transactionEdited: Transaction(amount: 24.0, date: .now, description: "Dinner", category: category, account: account))
-            .modelContainer(container)
+        EditTransactionView(transactionEdited: Transaction(amount: 24.0, date: .now, description: "Dinner", category: category, account: account), modelContext: container.mainContext)
     }
 }
 
 #Preview("Create Transaction") {
-    NavigationView {
-        EditTransactionView()
-            .modelContainer(PreviewContentData.generateContainer())
+    let container = PreviewContentData.generateContainer()
+    
+    return NavigationView {
+        EditTransactionView(modelContext: container.mainContext)
     }
 }
