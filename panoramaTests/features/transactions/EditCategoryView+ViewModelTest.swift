@@ -176,7 +176,7 @@ final class EditCategoryViewModelTest: XCTestCase {
         XCTAssertTrue(viewModel.isFormValid)
     }
     
-    func testFutureDatedRecurringTransaction() {
+    func testCreateFutureDatedRecurringTransaction() {
         // In the case of a future dated recurring transaction, you should have the transaction published as-is.
         let date = Calendar.current.startOfDay(for: Calendar.current.date(byAdding: .day, value: 5, to: .now)!)
         viewModel = ViewModel(modelContext: modelContext, editedTransaction: nil)
@@ -198,7 +198,7 @@ final class EditCategoryViewModelTest: XCTestCase {
         XCTAssertEqual(transactions.first!.date, date)
     }
     
-    func testSameDateRecurringTransactionRecurringTypeRecurringFrequencyControlInitialTransaction() {
+    func testCreateSameDateRecurringTransactionRecurringTypeRecurringFrequencyControlInitialTransaction() {
         
         // In the case of a transaction created on the same day, you should have:
         //     - The existing transaction published on the same day, with a .once recurrence. This is the purpose of the current Test.
@@ -228,7 +228,7 @@ final class EditCategoryViewModelTest: XCTestCase {
         XCTAssertEqual(soonestTransaction.date, date)
     }
     
-    func testSameDateRecurringTransactionRecurringTypeRecurringFrequencyControlRecurringTransaction() {
+    func testCreateSameDateRecurringTransactionRecurringTypeRecurringFrequencyControlRecurringTransaction() {
         
         // In the case of a transaction created on the same day, you should have:
         //     - The existing transaction published on the same day, with a .once recurrence.
@@ -258,7 +258,7 @@ final class EditCategoryViewModelTest: XCTestCase {
         XCTAssertEqual(latestTransaction.date, RecurringType.monthly.nextOccurenceFrom(startDate: date, frequency: 1))
     }
     
-    func testPassedDateRecurringTransactionRecurringTypeRecurringFrequencyControlPassedTransaction() {
+    func testCreatePassedDateRecurringTransactionRecurringTypeRecurringFrequencyControlPassedTransaction() {
         
         // In the case of a transaction created on a passed date, you should have:
         //     - as many as needed transacitons created for the passed occurences with a .once recurrence. This is the purpose of the current Test.
@@ -284,11 +284,13 @@ final class EditCategoryViewModelTest: XCTestCase {
         XCTAssertEqual(transactions.filter {$0.date == Calendar.current.startOfDay(for: .now)}.count, 1)
         XCTAssertEqual(transactions.filter {$0.transactionDescription == "Initial Transaction"}.count, 3)
         XCTAssertEqual(transactions.filter {$0.amount == 100}.count, 3)
+        XCTAssertEqual(transactions.filter {$0.category == testCategory}.count, 3)
+        XCTAssertEqual(transactions.filter {$0.account == testAccount}.count, 3)
         XCTAssertEqual(transactions.filter {$0.recurringType == .once}.count, 2)
         XCTAssertEqual(transactions.filter {$0.recurringFrequency == nil}.count, 2)
     }
     
-    func testPassedDateRecurringTransactionRecurringTypeRecurringFrequencyControlRecurringTransaction() {
+    func testCreatePassedDateRecurringTransactionRecurringTypeRecurringFrequencyControlRecurringTransaction() {
         
         // In the case of a transaction created on a passed date, you should have:
         //     - as many as needed transacitons created for the passed occurences with a .once recurrence.
@@ -315,10 +317,15 @@ final class EditCategoryViewModelTest: XCTestCase {
         XCTAssertEqual(transactions.filter {$0.date == Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: .now))!}.count, 1)
         XCTAssertEqual(transactions.filter {$0.transactionDescription == "Initial Transaction"}.count, 3)
         XCTAssertEqual(transactions.filter {$0.amount == 100}.count, 3)
+        XCTAssertEqual(transactions.filter {$0.category == testCategory}.count, 3)
+        XCTAssertEqual(transactions.filter {$0.account == testAccount}.count, 3)
         XCTAssertEqual(transactions.filter {$0.recurringType == .once}.count, 2)
         XCTAssertEqual(transactions.filter {$0.recurringFrequency == nil}.count, 2)
         XCTAssertEqual(transactions.filter {$0.date == Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: .now))!}.count, 1)
         XCTAssertEqual(transactions.filter {$0.date == Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: .now))!}.first!.recurringType, .daily)
         XCTAssertEqual(transactions.filter {$0.date == Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: .now))!}.first!.recurringFrequency, 1)
+
     }
+    
+    
 }
