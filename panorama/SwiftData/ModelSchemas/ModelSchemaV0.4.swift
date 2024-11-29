@@ -114,6 +114,17 @@ enum ModelSchemaV0_4_0: VersionedSchema {
                 case .yearly: return Calendar.current.date(byAdding: .year, value: frequency, to: startDate) ?? startDate
             }
         }
+        
+        func occurencesBetweenTwoDates(startDate: Date, endDate: Date, frequency: Int) -> [Date] {
+            var passedOccurences: [Date] = [startDate]
+            var currentEvaluatedDate = startDate
+            while (currentEvaluatedDate < endDate) {
+                currentEvaluatedDate = self.nextOccurenceFrom(startDate: currentEvaluatedDate, frequency: frequency)
+                passedOccurences.append(currentEvaluatedDate)
+            }
+            return passedOccurences
+        }
+
     }
 }
 
