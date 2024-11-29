@@ -32,11 +32,11 @@ enum ModelSchemaV0_4_0: VersionedSchema {
         @Relationship(deleteRule: .nullify, inverse: \Account.transactions)
         var account: Account?
         
-        var recurringType: RecurringType
-        var recurringFrequency: Int?
+        var recurringType: RecurringType? = RecurringType.once
+        var recurringFrequency: Int? = nil
         
-        init(amount: Double = 0, date: Date, description: String = "", category: Category?, account: Account?, recurringType: RecurringType = .once, recurringFrequency: Int? = nil) {
-            self.id = .init()
+        init(id: UUID = UUID(), amount: Double = 0, date: Date, description: String = "", category: Category?, account: Account?, recurringType: RecurringType = RecurringType.once, recurringFrequency: Int? = nil) {
+            self.id = id
             self.amount = amount
             self.date = date
             self.transactionDescription = description
@@ -58,8 +58,8 @@ enum ModelSchemaV0_4_0: VersionedSchema {
         @Attribute(originalName: "categoryType") var type: CategoryType
         var transactions: [Transaction]
         
-        init(name: String, iconName: String, type: CategoryType, transactions: [Transaction]) {
-            self.id = .init()
+        init(id: UUID = UUID(), name: String, iconName: String, type: CategoryType, transactions: [Transaction]) {
+            self.id = id
             self.name = name
             self.iconName = iconName
             self.type = type
@@ -75,8 +75,8 @@ enum ModelSchemaV0_4_0: VersionedSchema {
         var iconName: String
         var transactions: [Transaction]
         
-        init(name: String, iconName: String, transactions: [Transaction]) {
-            self.id = .init()
+        init(id: UUID = UUID(), name: String, iconName: String, transactions: [Transaction]) {
+            self.id = id
             self.name = name
             self.iconName = iconName
             self.transactions = transactions
