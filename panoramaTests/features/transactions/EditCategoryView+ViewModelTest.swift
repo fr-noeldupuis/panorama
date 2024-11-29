@@ -19,7 +19,7 @@ final class EditCategoryViewModelTest: XCTestCase {
         container.mainContext
     }
     var testAccount: Account!
-    var testCategory: ModelSchemaV0_4_0.Category!
+    var testCategory: panorama.Category!
     var viewModel: EditTransactionView.ViewModel!
 
     override func setUp() {
@@ -46,6 +46,7 @@ final class EditCategoryViewModelTest: XCTestCase {
     }
     
     func testViewModelInitializationWithTransaction() {
+        // This test ensures that the fields in the ViewModel are initiated the right way when injecting a transaction to be edited.
         let existingTransaction = Transaction(
             amount: 100.0,
             date: Date(),
@@ -66,7 +67,32 @@ final class EditCategoryViewModelTest: XCTestCase {
         XCTAssertNil(viewModel.recurringFrequency)
     }
     
+    func testViewModelInitializationWithRecurringTransaction() {
+        // This test ensures that the fields in the ViewModel are inititalized the right way when injecting a recurring transaction to be edited.
+        let existingTransaction = Transaction(
+            amount: 100.0,
+            date: Date(),
+            description: "Test Transaction",
+            category: testCategory,
+            account: testAccount,
+            recurringType: .monthly,
+            recurringFrequency: 5
+        )
+        modelContext.insert(existingTransaction)
+
+        viewModel = ViewModel(modelContext: modelContext, editedTransaction: existingTransaction)
+
+        XCTAssertEqual(viewModel.amountString, "100")
+        XCTAssertEqual(viewModel.date, existingTransaction.date)
+        XCTAssertEqual(viewModel.description, "Test Transaction")
+        XCTAssertEqual(viewModel.category, testCategory)
+        XCTAssertEqual(viewModel.account, testAccount)
+        XCTAssertEqual(viewModel.recurringType, .monthly)
+        XCTAssertEqual(viewModel.recurringFrequency, 5)
+    }
+    
     func testViewModelInitializationWithoutTransaction() {
+        // This test ensures that the fields in the ViewModel are inititalized with the right default values when no transaction is injected.
         viewModel = ViewModel(modelContext: modelContext, editedTransaction: nil)
 
         XCTAssertEqual(viewModel.amountString, "")
@@ -148,5 +174,87 @@ final class EditCategoryViewModelTest: XCTestCase {
         viewModel.recurringFrequencyString = "1"
         viewModel.recurringType = .weekly
         XCTAssertTrue(viewModel.isFormValid)
+    }
+    
+    func testFutureDatedRecurringTransaction() {
+        // In the case of a future dated recurring transaction, you should have the transaction published as-is.
+        let date = Calendar.current.startOfDay(for: Calendar.current.date(byAdding: .day, value: 5, to: .now)!)
+        viewModel = ViewModel(modelContext: modelContext, editedTransaction: nil)
+        viewModel.amountString = "100.0"
+        viewModel.date = date
+        viewModel.description = "Initial Transaction"
+        viewModel.category = testCategory
+        viewModel.account = testAccount
+        viewModel.recurringType = .monthly
+        viewModel.recurringFrequencyString = "1"
+        
+        viewModel.saveTransaction()
+        
+        let transactions = (try? modelContext.fetch(FetchDescriptor<Transaction>())) ?? []
+        
+        XCTAssertEqual(transactions.count, 1)
+        XCTAssertEqual(transactions.first!.recurringType, .monthly)
+        XCTAssertEqual(transactions.first!.recurringFrequency, 1)
+        XCTAssertEqual(transactions.first!.date, date)
+    }
+    
+    func testSameDateRecurringTransactionRecurringTypeRecurringFrequencyControlInitialTransaction() {
+        
+        // In the case of a transaction created on the same day, you should have:
+        //     - The existing transaction published on the same day, with a .once recurrence. This is the purpose of the current Test.
+        //     - The next occurence of the transaction, a new transaction copying everything, with a date based on the frequency and type of recurrence.
+        
+        let date = Calendar.current.startOfDay(for: .now)
+        
+        viewModel = ViewModel(modelContext: modelContext, editedTransaction: nil)
+        viewModel.amountString = "100.0"
+        viewModel.date = date
+        viewModel.description = "Initial Transaction"
+        viewModel.category = testCategory
+        viewModel.account = testAccount
+        viewModel.recurringType = .monthly
+        viewModel.recurringFrequencyString = "1"
+        
+        viewModel.saveTransaction()
+        
+        let transactions = (try? modelContext.fetch(FetchDescriptor<Transaction>())) ?? []
+        
+        XCTAssertEqual(transactions.count, 2)
+        
+        let soonestTransaction = transactions.sorted {$0.date < $1.date}.first!
+        
+        XCTAssertEqual(soonestTransaction.recurringType, .once)
+        XCTAssertNil(soonestTransaction.recurringFrequency)
+        XCTAssertEqual(soonestTransaction.date, date)
+    }
+    
+    func testSameDateRecurringTransactionRecurringTypeRecurringFrequencyControlRecurringTransaction() {
+        
+        // In the case of a transaction created on the same day, you should have:
+        //     - The existing transaction published on the same day, with a .once recurrence. This is the purpose of the current Test.
+        //     - The next occurence of the transaction, a new transaction copying everything, with a date based on the frequency and type of recurrence.
+        
+        let date = Calendar.current.startOfDay(for: .now)
+        
+        viewModel = ViewModel(modelContext: modelContext, editedTransaction: nil)
+        viewModel.amountString = "100.0"
+        viewModel.date = date
+        viewModel.description = "Initial Transaction"
+        viewModel.category = testCategory
+        viewModel.account = testAccount
+        viewModel.recurringType = .monthly
+        viewModel.recurringFrequencyString = "1"
+        
+        viewModel.saveTransaction()
+        
+        let transactions = (try? modelContext.fetch(FetchDescriptor<Transaction>())) ?? []
+        
+        XCTAssertEqual(transactions.count, 2)
+        
+        let latestTransaction = transactions.sorted {$0.date < $1.date}.last!
+        
+        XCTAssertEqual(latestTransaction.recurringType, .monthly)
+        XCTAssertEqual(latestTransaction.recurringFrequency, 1)
+        XCTAssertEqual(latestTransaction.date, RecurringType.monthly.nextOccurenceFrom(startDate: date, frequency: 1))
     }
 }

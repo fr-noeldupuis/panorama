@@ -121,23 +121,51 @@ extension EditTransactionView {
         func saveTransaction() {
             if (transaction != nil) {
                 // Update existing transaction
-                transaction?.amount = category!.type == .expense ? -amount! : amount!
-                transaction?.date = date
-                transaction?.transactionDescription = description
-                transaction?.category = category
-                transaction?.account = account
-                transaction?.recurringType = recurringType
-                transaction?.recurringFrequency = recurringType != .once ? recurringFrequency : nil
+                updateTransaction(transaction: &transaction!)
             } else {
-                let transactionToInsert = Transaction(
-                    amount: category!.type == .expense ? -amount! : amount!,
-                    date: date,
-                    description: description,
-                    category: category,
-                    account: account,
-                    recurringType: recurringType,
-                    recurringFrequency: recurringType != .once ? recurringFrequency : nil)
-                modelContext.insert(transactionToInsert)
+                if (recurringType == .once) {
+                    let transactionToInsert = Transaction(
+                        amount: category!.type == .expense ? -amount! : amount!,
+                        date: date,
+                        description: description,
+                        category: category,
+                        account: account,
+                        recurringType: .once,
+                        recurringFrequency: nil)
+                    modelContext.insert(transactionToInsert)
+                } else {
+                    if (date > .now) {
+                        let transactionToInsert = Transaction(
+                            amount: category!.type == .expense ? -amount! : amount!,
+                            date: date,
+                            description: description,
+                            category: category,
+                            account: account,
+                            recurringType: recurringType,
+                            recurringFrequency: recurringFrequency)
+                        modelContext.insert(transactionToInsert)
+                    } else if (date == Calendar.current.startOfDay(for: .now)) {
+                        let transactionToInsert = Transaction(
+                            amount: category!.type == .expense ? -amount! : amount!,
+                            date: date,
+                            description: description,
+                            category: category,
+                            account: account,
+                            recurringType: .once,
+                            recurringFrequency: nil)
+                        modelContext.insert(transactionToInsert)
+                        let recurringTransactionToInsert = Transaction(
+                            amount: category!.type == .expense ? -amount! : amount!,
+                            date: recurringType.nextOccurenceFrom(startDate: date, frequency: recurringFrequency!),
+                            description: description,
+                            category: category,
+                            account: account,
+                            recurringType: recurringType,
+                            recurringFrequency: recurringFrequency)
+                        modelContext.insert(recurringTransactionToInsert)
+                    }
+                }
+                
             }
             
             do {
@@ -147,5 +175,17 @@ extension EditTransactionView {
                 print("Error saving model: \(error.localizedDescription)")
             }
         }
+        
+        func updateTransaction(transaction: inout Transaction) {
+            transaction.amount = category!.type == .expense ? -amount! : amount!
+            transaction.date = date
+            transaction.transactionDescription = description
+            transaction.category = category
+            transaction.account = account
+            transaction.recurringType = recurringType
+            transaction.recurringFrequency = recurringType != .once ? recurringFrequency : nil
+        }
+        
+        
     }
 }
