@@ -27,45 +27,52 @@ struct TransactionListView: View {
     }()
 
     var body: some View {
-        List {
-            ForEach(
-                OrderedDictionary(grouping: transactions, by: \.date).elements,
-                id: \.key
-            ) { element in
-                let dailyTransactions = element.value
-                let date = element.key
-
-                let dailyTotal = dailyTransactions.reduce(0) { $0 + $1.amount }
-
-                Section(
-                    header: HStack {
-                        Text(dateFormatter.string(from: date))
-                        Spacer()
-                        Text("\(dailyTotal, specifier: "%.2f") €")
-                    }
-                ) {
-                    ForEach(dailyTransactions) { transaction in
-                        TransactionListRowView(transaction: transaction)
-                            .swipeActions(
-                                edge: .trailing, allowsFullSwipe: false
-                            ) {
-                                Button(role: .destructive) {
-                                    modelContext.delete(transaction)
-                                } label: {
-                                    Label("delete", systemImage: "trash.fill")
+        ScrollViewReader { proxy in
+            List {
+                ForEach(
+                    OrderedDictionary(grouping: transactions, by: \.date).elements,
+                    id: \.key
+                ) { element in
+                    let dailyTransactions = element.value
+                    let date = element.key
+                    
+                    let dailyTotal = dailyTransactions.reduce(0) { $0 + $1.amount }
+                    
+                    Section(
+                        header: HStack {
+                            Text(dateFormatter.string(from: date))
+                            Spacer()
+                            Text("\(dailyTotal, specifier: "%.2f") €")
+                        }
+                    ) {
+                        ForEach(dailyTransactions) { transaction in
+                            TransactionListRowView(transaction: transaction)
+                                .swipeActions(
+                                    edge: .trailing, allowsFullSwipe: false
+                                ) {
+                                    Button(role: .destructive) {
+                                        modelContext.delete(transaction)
+                                    } label: {
+                                        Label("delete", systemImage: "trash.fill")
+                                    }
                                 }
-                            }
+                                .opacity(transaction.date > .now ? 0.3 : 1)
+                        }
+                        
                     }
+                    
                 }
-                
             }
-        }
-        .navigationTitle("Transactions")
-        .navigationBarTitleDisplayMode(.large)
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                NavigationLink(destination: EditTransactionView()) {
-                    Image(systemName: "plus")
+            .onAppear {
+                proxy.scrollTo(Calendar.current.startOfDay(for: .now), anchor: .center)
+            }
+            .navigationTitle("Transactions")
+            .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    NavigationLink(destination: EditTransactionView(modelContext: modelContext)) {
+                        Image(systemName: "plus")
+                    }
                 }
             }
         }

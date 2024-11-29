@@ -84,7 +84,7 @@ struct PreviewContentData {
         container.mainContext.insert(
             Transaction(
                 amount: 17, date: Calendar.current.date(from: comps1)!,
-                description: "Test 00", category: cat1, account: acc1))
+                description: "Test 00", category: cat1, account: acc1, recurringType: .once))
         
         
 
@@ -96,16 +96,16 @@ struct PreviewContentData {
         container.mainContext.insert(
             Transaction(
                 amount: -20, date: Calendar.current.date(from: comps2)!,
-                description: "Test 1", category: cat1, account: acc1))
+                description: "Test 1", category: cat1, account: acc1, recurringType: .once))
         container.mainContext.insert(
-            Transaction(amount: -250, date: Calendar.current.date(from: comps2)!, category: cat1, account: acc1))
+            Transaction(amount: -250, date: Calendar.current.date(from: comps2)!, category: cat1, account: acc1, recurringType: .once))
         container.mainContext.insert(
             Transaction(
                 amount: 220, date: Calendar.current.date(from: comps2)!,
-                description: "Test 3", category: cat1, account: acc1))
+                description: "Test 3", category: cat1, account: acc1, recurringType: .once))
 
         container.mainContext.insert(
-            Transaction(amount: 17.54, date: Calendar.current.startOfDay(for: .now), category: cat1, account: acc1)
+            Transaction(amount: 17.54, date: Calendar.current.startOfDay(for: .now), category: cat1, account: acc1, recurringType: .once)
         )
         
         return container
@@ -142,7 +142,7 @@ struct PreviewContentData {
             let categoryName = Int.random(in: 0...(expenseCategoryNames.count - 1))
             let iconString = Int.random(in: 0...(sfSymbolsList.count - 1))
             
-            let category = Category(name: expenseCategoryNames[categoryName], iconName: sfSymbolsList[iconString], type: .income, transactions: [])
+            let category = Category(name: expenseCategoryNames[categoryName], iconName: sfSymbolsList[iconString], type: .expense, transactions: [])
             container.mainContext.insert(category)
             categoriesList.append(category)
         }
@@ -167,7 +167,7 @@ struct PreviewContentData {
             let category = categoriesList.randomElement()!
             let account = accountList.randomElement()!
             
-            let transaction = Transaction(amount: category.type == .expense ? -amount : amount, date: date, description: description, category: category, account: account)
+            let transaction = Transaction(amount: category.type == .expense ? -amount : amount, date: date, description: description, category: category, account: account, recurringType: .once)
             
             container.mainContext.insert(transaction)
         }
