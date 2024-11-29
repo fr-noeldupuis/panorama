@@ -121,7 +121,34 @@ extension EditTransactionView {
         func saveTransaction() {
             if (transaction != nil) {
                 // Update existing transaction
-                updateTransaction(transaction: &transaction!)
+                if (recurringType == .once) {
+                    updateTransaction(transaction: &transaction!)
+                } else {
+                    updateTransaction(transaction: &transaction!)
+                    if (date <= .now) {
+                        let transactionDatesToCreate = recurringType.occurencesBetweenTwoDates(startDate: date, endDate: Calendar.current.startOfDay(for: .now), frequency: recurringFrequency!)
+                        
+                        for dateToCreate in transactionDatesToCreate {
+                            let transactionToInsert = Transaction(
+                                amount: category!.type == .expense ? -amount! : amount!,
+                                date: dateToCreate,
+                                description: description,
+                                category: category,
+                                account: account,
+                                recurringType: .once,
+                                recurringFrequency: nil
+                            )
+                            modelContext.insert(transactionToInsert)
+                        }
+                        print(transactionDatesToCreate.last!)
+                        
+                        let nextDate = recurringType.nextOccurenceFrom(startDate: transactionDatesToCreate.last!, frequency: recurringFrequency!)
+                        print(nextDate)
+                        
+                        transaction?.date = nextDate
+                    }
+                }
+                
             } else {
                 if (recurringType == .once) {
                     let transactionToInsert = Transaction(

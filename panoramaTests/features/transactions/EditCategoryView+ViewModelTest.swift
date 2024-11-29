@@ -324,8 +324,189 @@ final class EditCategoryViewModelTest: XCTestCase {
         XCTAssertEqual(transactions.filter {$0.date == Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: .now))!}.count, 1)
         XCTAssertEqual(transactions.filter {$0.date == Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: .now))!}.first!.recurringType, .daily)
         XCTAssertEqual(transactions.filter {$0.date == Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: .now))!}.first!.recurringFrequency, 1)
-
+    }
+    
+    func testUpdateNonRecurringTransactionToRecurringTransaction() {
+        
+        // Expected behavior:
+        //     - a transaction for the upcoming occurence is created, it has the same information as the original with the recurrence.
+        //     - passed transactions (if relevant) are created
+        //
+        // Let's test behavior 1
+        let dateComponents = DateComponents(year: 2024, month: 11, day: 1)
+        let date = Calendar.current.date(from: dateComponents)!
+        
+        let transaction = Transaction(
+            amount: 100,
+            date: date,
+            description: "Test transaction",
+            category: testCategory,
+            account: testAccount,
+            recurringType: .once,
+            recurringFrequency: nil
+        )
+        
+        modelContext.insert(transaction)
+        
+        viewModel = ViewModel(modelContext: modelContext, editedTransaction: transaction)
+        
+        viewModel.recurringType = .daily
+        viewModel.recurringFrequencyString = "1"
+        
+        viewModel.saveTransaction()
+        
+        let transactions = (try? modelContext.fetch(FetchDescriptor<Transaction>())) ?? []
+        
+        let expectedNextOccurence = Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: .now))!
+        
+        XCTAssertEqual(transactions.filter {$0.date == expectedNextOccurence}.count, 1)
+        XCTAssertEqual(transactions.filter {$0.date == expectedNextOccurence}.first!.amount, transaction.amount)
+        XCTAssertEqual(transactions.filter {$0.date == expectedNextOccurence}.first!.transactionDescription, transaction.transactionDescription)
+        XCTAssertEqual(transactions.filter {$0.date == expectedNextOccurence}.first!.category, transaction.category)
+        XCTAssertEqual(transactions.filter {$0.date == expectedNextOccurence}.first!.account, transaction.account)
+        XCTAssertEqual(transactions.filter {$0.date == expectedNextOccurence}.first!.recurringType, .daily)
+        XCTAssertEqual(transactions.filter {$0.date == expectedNextOccurence}.first!.recurringFrequency, 1)
+    }
+    
+    func testUpdateNonRecurringTransactionToRecurringTransactionPastTransactions() {
+        
+        // Expected behavior:
+        //     - a transaction for the upcoming occurence is created, it has the same information as the original with the recurrence.
+        //     - passed transactions (if relevant) are created
+        //
+        // Let's test behavior 2
+        let dateComponents = DateComponents(year: 2024, month: 11, day: 1)
+        let date = Calendar.current.date(from: dateComponents)!
+        
+        let transaction = Transaction(
+            amount: 100,
+            date: date,
+            description: "Test transaction",
+            category: testCategory,
+            account: testAccount,
+            recurringType: .once,
+            recurringFrequency: nil
+        )
+        
+        modelContext.insert(transaction)
+        
+        viewModel = ViewModel(modelContext: modelContext, editedTransaction: transaction)
+        
+        viewModel.recurringType = .daily
+        viewModel.recurringFrequencyString = "1"
+        
+        viewModel.saveTransaction()
+        
+        let transactions = (try? modelContext.fetch(FetchDescriptor<Transaction>())) ?? []
+        
+        let expectedNextOccurence = Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: .now))!
+        
+        XCTAssertEqual(transactions.count, 30)
+        XCTAssertTrue(transactions.allSatisfy {$0.amount == transaction.amount})
+        XCTAssertTrue(transactions.allSatisfy {$0.transactionDescription == transaction.transactionDescription})
+        XCTAssertTrue(transactions.allSatisfy {$0.category == transaction.category})
+        XCTAssertTrue(transactions.allSatisfy {$0.account == transaction.account})
+        XCTAssertTrue(transactions.filter {$0.date != expectedNextOccurence}.allSatisfy {$0.recurringType == .once})
+        XCTAssertTrue(transactions.filter {$0.date != expectedNextOccurence}.allSatisfy {$0.recurringFrequency == nil})
+    }
+    
+    func testUpdateNonRecurringTransactionToRecurringTransactionSameDayPastTransactions() {
+        
+        // Expected behavior:
+        //     - a transaction for the upcoming occurence is created, it has the same information as the original with the recurrence.
+        //     - passed transactions (if relevant) are created
+        //
+        // Let's test behavior 2
+        let dateComponents = DateComponents(year: 2024, month: 11, day: 1)
+        let date = Calendar.current.date(from: dateComponents)!
+        
+        let transaction = Transaction(
+            amount: 100,
+            date: date,
+            description: "Test transaction",
+            category: testCategory,
+            account: testAccount,
+            recurringType: .once,
+            recurringFrequency: nil
+        )
+        
+        modelContext.insert(transaction)
+        
+        viewModel = ViewModel(modelContext: modelContext, editedTransaction: transaction)
+        
+        viewModel.date = Calendar.current.startOfDay(for: .now)
+        viewModel.recurringType = .daily
+        viewModel.recurringFrequencyString = "1"
+        
+        viewModel.saveTransaction()
+        
+        let transactions = (try? modelContext.fetch(FetchDescriptor<Transaction>())) ?? []
+        
+        let expectedNextOccurence = Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: .now))!
+        
+        XCTAssertEqual(transactions.count, 2)
+        XCTAssertTrue(transactions.allSatisfy {$0.amount == transaction.amount})
+        XCTAssertTrue(transactions.allSatisfy {$0.transactionDescription == transaction.transactionDescription})
+        XCTAssertTrue(transactions.allSatisfy {$0.category == transaction.category})
+        XCTAssertTrue(transactions.allSatisfy {$0.account == transaction.account})
+        XCTAssertTrue(transactions.filter {$0.date != expectedNextOccurence}.allSatisfy {$0.recurringType == .once})
+        XCTAssertTrue(transactions.filter {$0.date != expectedNextOccurence}.allSatisfy {$0.recurringFrequency == nil})
     }
     
     
+    func testUpdateFutureRecurringTransaction() {
+        
+        let date = Calendar.current.date(byAdding: .day, value: 30, to: Calendar.current.startOfDay(for: .now))!
+        
+        let transaction = Transaction(
+            amount: 100,
+            date: date,
+            description: "Test transaction",
+            category: testCategory,
+            account: testAccount,
+            recurringType: .daily,
+            recurringFrequency: 1
+        )
+        
+        modelContext.insert(transaction)
+        
+        viewModel = ViewModel(modelContext: modelContext, editedTransaction: transaction)
+        
+        viewModel.amountString = "100"
+        viewModel.saveTransaction()
+        
+        let transactions = (try? modelContext.fetch(FetchDescriptor<Transaction>())) ?? []
+        
+        XCTAssertTrue(transactions.count == 1)
+        XCTAssertTrue(transactions.first!.date == date)
+        XCTAssertTrue(transactions.first!.amount == 100)
+    }
+    
+    func testPastDateRecurringTransaction() {
+        
+        let oldDate = Calendar.current.date(byAdding: .day, value: 4, to: Calendar.current.startOfDay(for: .now))!
+        
+        let newDate = Calendar.current.date(byAdding: .day, value: -4, to: Calendar.current.startOfDay(for: .now))!
+        
+        let transaction = Transaction(
+            amount: 100,
+            date: oldDate,
+            description: "Test transaction",
+            category: testCategory,
+            account: testAccount,
+            recurringType: .daily,
+            recurringFrequency: 1
+        )
+        
+        modelContext.insert(transaction)
+        
+        viewModel = ViewModel(modelContext: modelContext, editedTransaction: transaction)
+        
+        viewModel.date = newDate
+        viewModel.saveTransaction()
+        
+        let transactions = (try? modelContext.fetch(FetchDescriptor<Transaction>())) ?? []
+        
+        XCTAssertTrue(transactions.count == 6)
+    }
 }

@@ -169,6 +169,19 @@ final class ModelSchemaTest: XCTestCase {
         XCTAssertEqual(calculatedOccurences, expectedOccurences)
     }
     
+    func testOccurencesBetweenDatesDailyPastDates() {
+        
+        let endDate = Calendar.current.startOfDay(for: .now)
+        let startDate = Calendar.current.date(byAdding: .day, value: -4, to: Calendar.current.startOfDay(for: .now))!
+        
+        let expectedOccurences: [Date] = [Calendar.current.date(byAdding: .day, value: -4, to: endDate)!, Calendar.current.date(byAdding: .day, value: -3, to: endDate)!, Calendar.current.date(byAdding: .day, value: -2, to: endDate)!, Calendar.current.date(byAdding: .day, value: -1, to: endDate)!, endDate]
+        
+        
+        let calculatedOccurences = RecurringType.daily.occurencesBetweenTwoDates(startDate: startDate, endDate: endDate, frequency: 1)
+        
+        XCTAssertEqual(calculatedOccurences, expectedOccurences)
+    }
+    
     func testOccurencesBetweenDatesSameDate() {
         
         let startDate = Calendar.current.startOfDay(for: .now)

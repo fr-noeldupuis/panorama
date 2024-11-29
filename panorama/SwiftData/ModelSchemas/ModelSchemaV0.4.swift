@@ -116,6 +116,9 @@ enum ModelSchemaV0_4_0: VersionedSchema {
         }
         
         func occurencesBetweenTwoDates(startDate: Date, endDate: Date, frequency: Int) -> [Date] {
+            
+            guard startDate <= endDate else { return [] }
+            
             var passedOccurences: [Date] = [startDate]
             var currentEvaluatedDate = startDate
             while (currentEvaluatedDate < endDate) {
