@@ -17,18 +17,29 @@ enum PanoramaMigrationPlan: SchemaMigrationPlan {
     }
     
     static let migratev0_3_2tov0_4_0 = MigrationStage.custom(
+        
+        // Steps to do
+        // Before:
+        //     - Nothing
+        // After:
+        //     - Set recurringType value to .once for all elements
+        //     - Set reccuringFrequency value to nil for all elements
+        
         fromVersion: ModelSchemaV0_3_2.self,
         toVersion: ModelSchemaV0_4_0.self,
-        willMigrate: nil,
-        didMigrate: { context in
-            let transactions = (try? context.fetch(FetchDescriptor<ModelSchemaV0_4_0.Transaction>())) ?? []
+        willMigrate: { context in
             
-            for transaction in transactions {
-                transaction.recurringFrequency = nil
+        },
+        didMigrate: { context in
+            let transactions = try? context.fetch(FetchDescriptor<ModelSchemaV0_4_0.Transaction>())
+                                
+            transactions?.forEach({ transaction in
                 transaction.recurringType = .once
-            }
+                transaction.recurringFrequency = nil
+            })
             
             try? context.save()
-    })
+        }
+    )
         
 }

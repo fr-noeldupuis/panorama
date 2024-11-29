@@ -7,8 +7,9 @@
 
 import Foundation
 
-typealias Transaction = ModelSchemaV0_4_0.Transaction
-typealias Category = ModelSchemaV0_4_0.Category
-typealias Account = ModelSchemaV0_4_0.Account
-typealias CategoryType = ModelSchemaV0_4_0.CategoryType
-typealias RecurringType = ModelSchemaV0_4_0.RecurringType
+typealias LatestSchema = ModelSchemaV0_4_0
+typealias Transaction = LatestSchema.Transaction
+typealias Category = LatestSchema.Category
+typealias Account = LatestSchema.Account
+typealias CategoryType = LatestSchema.CategoryType
+typealias RecurringType = LatestSchema.RecurringType
