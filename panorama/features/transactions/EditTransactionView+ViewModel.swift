@@ -163,6 +163,33 @@ extension EditTransactionView {
                             recurringType: recurringType,
                             recurringFrequency: recurringFrequency)
                         modelContext.insert(recurringTransactionToInsert)
+                    } else {
+                        var passedOccurencesToCreate: [Date] = []
+                        var dateToCheck = date
+                        while (dateToCheck <= Calendar.current.startOfDay(for: .now)) {
+                            passedOccurencesToCreate.append(dateToCheck)
+                            dateToCheck = recurringType.nextOccurenceFrom(startDate: dateToCheck, frequency: recurringFrequency!)
+                        }
+                        for passedOccurence in passedOccurencesToCreate {
+                            let transactionToInsert = Transaction(
+                                amount: category!.type == .expense ? -amount! : amount!,
+                                date: passedOccurence,
+                                description: description,
+                                category: category,
+                                account: account,
+                                recurringType: .once,
+                                recurringFrequency: nil)
+                            modelContext.insert(transactionToInsert)
+                        }
+                        let recurringTransactionToInsert = Transaction(
+                            amount: category!.type == .expense ? -amount! : amount!,
+                            date: recurringType.nextOccurenceFrom(startDate: passedOccurencesToCreate.last!, frequency: recurringFrequency!),
+                            description: description,
+                            category: category,
+                            account: account,
+                            recurringType: recurringType,
+                            recurringFrequency: recurringFrequency)
+                        modelContext.insert(recurringTransactionToInsert)
                     }
                 }
                 
