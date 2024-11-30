@@ -401,7 +401,9 @@ final class EditCategoryViewModelTest: XCTestCase {
         
         let expectedNextOccurence = Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: .now))!
         
-        XCTAssertEqual(transactions.count, 30)
+        let expectedNbDays = Calendar.current.dateComponents([.day], from: date, to: expectedNextOccurence).day!
+        
+        XCTAssertEqual(transactions.count, expectedNbDays + 1)
         XCTAssertTrue(transactions.allSatisfy {$0.amount == transaction.amount})
         XCTAssertTrue(transactions.allSatisfy {$0.transactionDescription == transaction.transactionDescription})
         XCTAssertTrue(transactions.allSatisfy {$0.category == transaction.category})

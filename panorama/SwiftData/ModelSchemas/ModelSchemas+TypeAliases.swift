@@ -8,6 +8,7 @@
 import Foundation
 
 typealias LatestSchema = ModelSchemaV0_4_0
+
 typealias Transaction = LatestSchema.Transaction
 typealias Category = LatestSchema.Category
 typealias Account = LatestSchema.Account
