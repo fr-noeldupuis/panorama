@@ -9,11 +9,11 @@ import SwiftData
 enum PanoramaMigrationPlan: SchemaMigrationPlan {
     
     static var schemas: [any VersionedSchema.Type] {
-        [ModelSchemaV0_3_2.self, ModelSchemaV0_4_0.self]
+        [ModelSchemaV0_3_2.self, ModelSchemaV0_4_0.self, ModelSchemaV0_4_1.self]
     }
     
     static var stages: [MigrationStage] {
-        [migratev0_3_2tov0_4_0]
+        [migratev0_3_2tov0_4_0, migratev0_4_0tov0_4_1]
     }
     
     static let migratev0_3_2tov0_4_0 = MigrationStage.custom(
@@ -40,6 +40,11 @@ enum PanoramaMigrationPlan: SchemaMigrationPlan {
             
             try? context.save()
         }
+    )
+    
+    static let migratev0_4_0tov0_4_1 = MigrationStage.lightweight(
+        fromVersion: ModelSchemaV0_4_0.self,
+        toVersion: ModelSchemaV0_4_1.self
     )
         
 }
